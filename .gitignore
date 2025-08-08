@@ -1,0 +1,17 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# SQLite database
+db.sqlite3
+
+# Environment variables
+.env
+
+# IDE/editor folders
+.vscode/
+*.swp
+
+# Migrations cache
+*/migrations/__pycache__/
+*/migrations/*.pyc
