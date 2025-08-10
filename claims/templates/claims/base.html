@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Claims Data</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"> <!-- tailwind css -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script> <!-- htmx -->
+</head>
+<body class="bg-gray-50 p-6">
+
+    <h1 class="text-2xl font-bold mb-4">Claims Table</h1> <!-- table title -->
+
+    <!-- HTMX setup 
+        loads frome home url
+        on fetch load the table
+        target is claims-table
+        swap the html
+    --> 
+    <div    id="claims-table" 
+            hx-get="{% url 'home' %}"   
+            hx-trigger="load"  
+            hx-target="#claims-table" 
+            hx-swap="innerHTML">
+
+            <!-- claims table and pagination controls -->
+            {% include "claims/claims_table_body.html" %}
+    </div>
+
+</body>
+</html>
