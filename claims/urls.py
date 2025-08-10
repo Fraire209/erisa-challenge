@@ -1,0 +1,7 @@
+from django.urls import path
+from claims import views  # import your views.py file
+
+urlpatterns = [
+    path("", views.home, name="home"),  
+    # "" means this URL pattern matches the root of wherever this app is mounted
+]

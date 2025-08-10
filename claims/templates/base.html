@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Claims Data</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-50 p-6">
+
+    <h1 class="text-2xl font-bold mb-4">Claims Table</h1>
+
+    <table class="table-auto w-full border border-gray-300">
+        <thead>
+            <tr class="bg-gray-200 text-left">
+                <th class="px-4 py-2 border">ID</th>
+                <th class="px-4 py-2 border">Claim ID</th>
+                <th class="px-4 py-2 border">Patient Name</th>
+                <th class="px-4 py-2 border">Billed Amount</th>
+                <th class="px-4 py-2 border">Paid Amount</th>
+                <th class="px-4 py-2 border">Status</th>
+                <th class="px-4 py-2 border">Insurer Name</th>
+                <th class="px-4 py-2 border">Discharge Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for claim in claims %}
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-2 border">{{ claim.id }}</td>
+                <td class="px-4 py-2 border">{{ claim.claim_id }}</td>
+                <td class="px-4 py-2 border">{{ claim.patient_name }}</td>
+                <td class="px-4 py-2 border">${{ claim.billed_amount }}</td>
+                <td class="px-4 py-2 border">${{ claim.paid_amount }}</td>
+                <td class="px-4 py-2 border">{{ claim.status }}</td>
+                <td class="px-4 py-2 border">{{ claim.insurer_name }}</td>
+                <td class="px-4 py-2 border">{{ claim.discharge_date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-4 py-2 text-center text-gray-500">
+                    No claims found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
