@@ -1,72 +1,101 @@
 
-<!-- table using tailwing css -->
-<table class="table-auto w-full border border-gray-300">
-    <thead>
-        <tr class="bg-gray-200 text-left">
+<!-- flexbox to stack children vertically -->
+<div class="flex flex-col">
+    <!-- table using tailwing css -->
+    <table class="table-auto w-full border border-gray-300 rounded-lg overflow-hidden">
+        <thead>
+            <tr class="bg-gray-200 text-left border-l-2 border-r-2 border border-gray-300">
 
-            <!-- table headers-->
-            <th class="px-4 py-2 border">Claim ID</th>
-            <th class="px-4 py-2 border">Patient Name</th>
-            <th class="px-4 py-2 border">Billed Amount</th>
-            <th class="px-4 py-2 border">Paid Amount</th>
-            <th class="px-4 py-2 border">Status</th>
-            <th class="px-4 py-2 border">Insurer Name</th>
-            <th class="px-4 py-2 border">Discharge Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- loops over claims passed from views-->
-        {% for claim in claims %}
-        <!-- for each claim, creates a table row with all the attributes-->
-        <tr class="text-left border-b">
-            <td class="px-4 py-2">{{ claim.claim_id }}</td>  
-            <td class="px-4 py-2">{{ claim.patient_name }}</td>
-            <td class="px-4 py-2">${{ claim.billed_amount }}</td>
-            <td class="px-4 py-2">${{ claim.paid_amount }}</td>
-            <td class="px-4 py-2">{{ claim.status }}</td>
-            <td class="px-4 py-2">{{ claim.insurer_name }}</td>
-            <td class="px-4 py-2">{{ claim.discharge_date }}</td>
-        </tr>
-        <!-- empty table case-->
-        {% empty %}
-        <tr>
-            <td colspan="8" class="px-4 py-2 text-center text-gray-500">
-                No claims found.
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                <!-- table headers-->
+                <th class="px-4 py-2 border">Claim ID</th>
+                <th class="px-4 py-2 border">Patient Name</th>
+                <th class="px-4 py-2 border">Billed Amount</th>
+                <th class="px-4 py-2 border">Paid Amount</th>
+                <th class="px-4 py-2 border">Status</th>
+                <th class="px-4 py-2 border">Insurer Name</th>
+                <th class="px-4 py-2 border">Discharge Date</th>
+                <th class="px-4 py-2 text-left">Actions</th>
+            </tr>
+        </thead>
+        <tbody class = "divide-y border-l-2 border-r-2 border-gray-300 divide-gray-300">
+            <!-- loops over claims passed from views-->
+            {% for claim in claims %}
+            <!-- for each claim, creates a table row with all the attributes-->
+            <tr class="text-left hover:bg-blue-100">
+                <td class="px-4 py-2">{{ claim.claim_id }}</td>  
+                <td class="px-4 py-2">{{ claim.patient_name }}</td>
+                <td class="px-4 py-2">${{ claim.billed_amount }}</td>
+                <td class="px-4 py-2">${{ claim.paid_amount }}</td>
+                <td class="px-4 py-2">{{ claim.status }}</td>
+                <td class="px-4 py-2">{{ claim.insurer_name }}</td>
+                <td class="px-4 py-2">{{ claim.discharge_date }}</td>
+                <td class="px-4 py-2 text-center"> 
+                    <!-- htmx setup for claim details dashboard updates through view button -->
+                    <button                                                         
+                        hx-get="{% url 'claim_detail_partial' claim.id %}"
+                        hx-target="#claim-detail-panel"
+                        hx-swap="innerHTML"
+                        class="block  bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+                        View
+                    </button>
+                </td>
+            </tr>
+            <!-- empty table case-->
+            {% empty %}
+            <tr>
+                <td colspan="8" class="px-4 py-2 text-center text-gray-500">
+                    No claims found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+            <td colspan="8" class="border-t-2 border-gray-300 p-0"></td>
+            </tr>
+        </tfoot>
+    </table>
 
-<!-- Pagination controls -->
-<div class="flex justify-between mt-4"> <!-- This flex container keeps first element to the left of page and second to the right for the previous and next buttons -->
+    <!-- Pagination controls -->
+    <div class="flex justify-between mt-4"> <!-- This flex container keeps first element to the left of page and second to the right for the previous and next buttons -->
 
-    <!-- only displays previous button if there are previous pages and keeps  -->
-    <!-- swaps only the tables content, but keeps search input -->
-    {% if claims.has_previous %}
-        <button 
-            hx-get="?page={{ claims.previous_page_number }}&q={{ request.GET.q|urlencode }}"
-            hx-target="#claims-table" 
-            hx-swap="innerHTML"
-            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-            ← Previous <!-- button text -->
-        </button>
-    {% else %}
-        <!-- keeps empty invisible element on left side of page for stability-->
-        <span></span>
-    {% endif %}
+        <!-- only displays previous button if there are previous pages and keeps  -->
+        <!-- swaps only the tables content, but keeps search input -->
+        {% if claims.has_previous %}
+            <button 
+                hx-get="?page={{ claims.previous_page_number }}&q={{ request.GET.q|urlencode }}"
+                hx-target="#claims-table" 
+                hx-swap="innerHTML"
+                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                ← Previous <!-- button text -->
+            </button>
+        {% else %}
+            <!-- keeps empty invisible element on left side of page for stability-->
+            <span></span>
+        {% endif %}
 
-    <!-- only displays next button if there are more pages -->
-    {% if claims.has_next %}
-        <button 
-            hx-get="?page={{ claims.next_page_number }}&q={{ request.GET.q|urlencode }}"
-            hx-target="#claims-table"
-            hx-swap="innerHTML"
-            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
-            Next → <!-- button text -->
-        </button>
-    {% else %}
-        <!-- keeps empty invisible element on right side of page for stability-->
-        <span></span>
-    {% endif %}
+        <!-- only displays next button if there are more pages -->
+        {% if claims.has_next %}
+            <button 
+                hx-get="?page={{ claims.next_page_number }}&q={{ request.GET.q|urlencode }}"
+                hx-target="#claims-table"
+                hx-swap="innerHTML"
+                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                Next → <!-- button text -->
+            </button>
+        {% else %}
+            <!-- keeps empty invisible element on right side of page for stability-->
+            <span></span>
+        {% endif %}
+    </div>
+
+
+        <!-- Fixed bottom-left panel -->
+    <div id="claim-detail-panel" class="mt-4 w-1/2 bg-gray-100 border border-gray-300 shadow p-4 rounded-2xl overflow-auto">
+        {% if claims %}
+            {% include "claims/claim_detail_partial.html" with claim=claims.0 %} <!-- this selects the first item in the table as the default -->
+        {% else %}
+            <p>No claim selected.</p> 
+        {% endif %}
+    </div>
 </div>

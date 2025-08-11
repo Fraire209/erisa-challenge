@@ -16,7 +16,7 @@ class Claim(models.Model):
     def __str__(self):
         return f"Claim {self.claim_id} - {self.patient_name}"
     
-#Table schema for claim detail data
+#Table schema for claim detail data, data can cbe accessed from claim.details.all
 class ClaimDetail(models.Model):
     claim = models.ForeignKey(Claim, on_delete=models.CASCADE, related_name="details") #links this table to the matching claim in the "claims.claim" table. The FK will be a auto generated incremental number starting from 1
     claim_id_original = models.IntegerField(blank=True, null=True)  # store original claim_id

@@ -1,0 +1,23 @@
+<!-- detail dashboard template -->
+<div>
+    <h2 class="text-lg font-semibold mb-2">Claim Details - {{ claim.claim_id }}</h2>
+    <p><strong>Insurer:</strong> {{ claim.insurer_name }}</p>
+    <p><strong>Status:</strong> {{ claim.status }}</p>
+    <p><strong>Discharge:</strong> {{ claim.discharge_date }}</p>
+    <p><strong>Patient Name:</strong> {{ claim.patient_name }}</p>
+    <p><strong>Paid Amount:</strong> {{claim.paid_amount}}</p>
+    <p><strong>Billed Amount: </strong> {{claim.billed_amount}} </p>
+
+    <!-- searches through claims.details to see if there is associated information to the claim-->
+    {% if claim.details.all %}
+        {% for detail in claim.details.all %}
+            <p><strong>Denial Reason:</strong> {{ detail.denial_reason }}</p>
+            <p><strong>CPT Codes:</strong> {{ detail.cpt_codes }}</p>
+    
+        {% endfor %}
+    
+    {% else %}
+        <p>No claim detail records found.</p>
+    {% endif %}
+
+</div>
