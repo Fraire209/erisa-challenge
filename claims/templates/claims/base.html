@@ -2,15 +2,87 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Claims Data</title>
+    <title>Claims Management System</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"> <!-- tailwind css -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script> <!-- htmx -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script> <!-- alpine.js -->
+
 </head>
+
 <body class="bg-gray-50 p-6">
 
-    <h1 class="text-2xl font-bold mb-4">Claims Table</h1> <!-- table title -->
+    <h1 class="text-2xl text-center font-bold mb-4">Claims Management System</h1> <!-- table title -->
 
-    <!-- HTMX setup 
+    <!-- x-data initializes an alpine reactive state variable named open set to false, tracking whether filter dropdown is open or not.
+        Clicking outside of the panel (form) sets the variable back to false to close it -->
+    <form
+        hx-get="{% url 'home' %}"
+        hx-target="#claims-table"
+        hx-swap="innerHTML"
+        class="mb-4"
+        x-data="{ open: false }"
+        @click.outside="open = false"
+        >
+        <div class="flex items-center space-x-2">
+            <input
+                type="search"
+                name="q"
+                id="search"
+                placeholder="Search claims..."
+                value="{{ q }}"
+                class="w-3/4 px-4 py-2 border rounded"
+                autocomplete="off"
+            />
+
+            <!-- @click is used here to open and close the dropdown when clicking the filter button -->
+            <button
+                type="button"
+                @click="open = !open"
+                class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Filter</button>
+
+            <button
+            type="submit"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Apply</button>
+        </div>
+
+        <!-- shows the pannel only when open is true, x-transition adds visual effect-->
+        <div
+            x-show="open"
+            class="mt-2 p-4 border rounded bg-white shadow-md"
+            x-transition>
+
+            <label class="block mb-2">
+            Insurer:
+            <select name="insurer" class="mt-1 px-3 py-2 border rounded w-full">
+                <option value="">All Insurers</option>
+                {% for insurer in insurers %}
+                <option value="{{ insurer }}" {% if insurer == selected_insurer %}selected{% endif %}>
+                    {{ insurer }}
+                </option>
+                {% endfor %}
+            </select>
+            </label>
+
+            <!-- selected attribute is added to keep the user selection in the filter dropdown even after page updates for both insurer and staturs-->
+
+            <label class="block mb-2">
+            Status:
+            <select name="status" class="mt-1 px-3 py-2 border rounded w-full">
+                <option value="">All Statuses</option>
+                {% for status in statuses %}
+                <option value="{{ status }}" {% if status == selected_status %}selected{% endif %}>
+                    {{ status }}
+                </option>
+                {% endfor %}
+            </select>
+            </label>
+
+        </div>
+    </form>
+
+
+
+    <!-- HTMX table setup 
         loads frome home url
         on fetch load the table
         target is claims-table

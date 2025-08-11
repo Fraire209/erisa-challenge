@@ -5,7 +5,6 @@
         <tr class="bg-gray-200 text-left">
 
             <!-- table headers-->
-            <th class="px-4 py-2 border">ID</th>
             <th class="px-4 py-2 border">Claim ID</th>
             <th class="px-4 py-2 border">Patient Name</th>
             <th class="px-4 py-2 border">Billed Amount</th>
@@ -19,15 +18,14 @@
         <!-- loops over claims passed from views-->
         {% for claim in claims %}
         <!-- for each claim, creates a table row with all the attributes-->
-        <tr class="border-b hover:bg-gray-50">
-            <td class="px-4 py-2 border">{{ claim.id }}</td> <!-- tailwing css border, spacing, and hover effects -->
-            <td class="px-4 py-2 border">{{ claim.claim_id }}</td>
-            <td class="px-4 py-2 border">{{ claim.patient_name }}</td>
-            <td class="px-4 py-2 border">${{ claim.billed_amount }}</td>
-            <td class="px-4 py-2 border">${{ claim.paid_amount }}</td>
-            <td class="px-4 py-2 border">{{ claim.status }}</td>
-            <td class="px-4 py-2 border">{{ claim.insurer_name }}</td>
-            <td class="px-4 py-2 border">{{ claim.discharge_date }}</td>
+        <tr class="text-left border-b">
+            <td class="px-4 py-2">{{ claim.claim_id }}</td>  
+            <td class="px-4 py-2">{{ claim.patient_name }}</td>
+            <td class="px-4 py-2">${{ claim.billed_amount }}</td>
+            <td class="px-4 py-2">${{ claim.paid_amount }}</td>
+            <td class="px-4 py-2">{{ claim.status }}</td>
+            <td class="px-4 py-2">{{ claim.insurer_name }}</td>
+            <td class="px-4 py-2">{{ claim.discharge_date }}</td>
         </tr>
         <!-- empty table case-->
         {% empty %}
@@ -43,10 +41,11 @@
 <!-- Pagination controls -->
 <div class="flex justify-between mt-4"> <!-- This flex container keeps first element to the left of page and second to the right for the previous and next buttons -->
 
-    <!-- only displays previous button if there are previous pages -->
+    <!-- only displays previous button if there are previous pages and keeps  -->
+    <!-- swaps only the tables content, but keeps search input -->
     {% if claims.has_previous %}
         <button 
-            hx-get="?page={{ claims.previous_page_number }}"
+            hx-get="?page={{ claims.previous_page_number }}&q={{ request.GET.q|urlencode }}"
             hx-target="#claims-table" 
             hx-swap="innerHTML"
             class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
@@ -60,7 +59,7 @@
     <!-- only displays next button if there are more pages -->
     {% if claims.has_next %}
         <button 
-            hx-get="?page={{ claims.next_page_number }}"
+            hx-get="?page={{ claims.next_page_number }}&q={{ request.GET.q|urlencode }}"
             hx-target="#claims-table"
             hx-swap="innerHTML"
             class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
