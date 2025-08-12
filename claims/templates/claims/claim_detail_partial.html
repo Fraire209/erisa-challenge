@@ -1,19 +1,64 @@
+
+{% load humanize %} <!-- for number formatting -->
+
 <!-- detail dashboard template -->
 <div>
-    <h2 class="text-lg font-semibold mb-2">Claim Details - {{ claim.claim_id }}</h2>
-    <p><strong>Insurer:</strong> {{ claim.insurer_name }}</p>
-    <p><strong>Status:</strong> {{ claim.status }}</p>
-    <p><strong>Discharge:</strong> {{ claim.discharge_date }}</p>
-    <p><strong>Patient Name:</strong> {{ claim.patient_name }}</p>
-    <p><strong>Paid Amount:</strong> {{claim.paid_amount}}</p>
-    <p><strong>Billed Amount: </strong> {{claim.billed_amount}} </p>
+    <!-- title and status -->
+    <div class="grid grid-cols-2 gap-4 mb-2 font-semibold">
+        <h2 class="text-lg text-blue-800">Claim Details - {{ claim.claim_id }}</h2>
+        <p class="justify-self-end inline-block px-2 py-1.5 rounded-2xl   {% if claim.status == 'Denied' %} text-red-900 bg-red-100 {% elif claim.status == 'Paid' %} text-green-500 bg-green-100 {% else %} text-blue-500 bg-blue-100 {% endif %}"> {{ claim.status }}</p> <!-- approved green, denied red, under review blue -->
+    </div>
+
+    <!-- divides grid into two columns -->
+     <div class="flex justify-center mb-6 space-x-80">          <!-- space-x-80 is the space betweent the two items, increased bottom margin (mb) -->
+        <!-- Patient Name -->
+        <div class="flex flex-col">                             <!-- stacks children vertically using span tags -->
+            <span class="font-semibold text-gray-600">Patient Name:</span>
+            <span class="font-bold">{{ claim.patient_name }}</span>
+        </div>
+
+        <!-- Discharge Date -->
+        <div class="flex flex-col text-right">
+            <span class="font-semibold text-gray-600">Discharge:</span>
+            <span>{{ claim.discharge_date }}</span>
+        </div>
+    </div>
+
+   
+    <div class="flex justify-center mb-2 space-x-80">
+        <!-- Billed Amount-->
+        <div class="flex flex-col">
+            <span class="font-semibold text-gray-600">Billed Amount:</span>
+            <span class="font-bold">${{ claim.billed_amount|floatformat:2|intcomma }}</span> <!-- float number formatting with commas -->
+        </div>
+
+        <!-- Paid Amount -->
+        <div class="flex flex-col text-right">
+            <span class="font-semibold text-gray-600">Paid Amount:</span>
+            <span class="font-bold text-red-500">${{ claim.paid_amount|floatformat:2|intcomma }}</span>
+        </div>
+    </div>
+    
 
     <!-- searches through claims.details to see if there is associated information to the claim-->
     {% if claim.details.all %}
         {% for detail in claim.details.all %}
-            <p><strong>Denial Reason:</strong> {{ detail.denial_reason }}</p>
-            <p><strong>CPT Codes:</strong> {{ detail.cpt_codes }}</p>
-    
+
+            <div class="flex flex-col items-center mb-4"> <!-- stack children vertically-->
+                <span class="font-semibold text-center text-gray-600">CPT Codes:</span>
+                <span class="text-center font-semibold">{{ detail.cpt_codes }}</span>
+            </div>
+
+            <div class="flex flex-col items-center mb-4">
+                <span class="font-semibold text-center text-gray-600">Insurer:</span>
+                <span class="text-center">{{ claim.insurer_name }}</span>
+            </div>
+
+            <div class="flex flex-col items-center mb-4">
+                <span class="font-semibold text-center text-gray-600">Denial Reason:</span>
+                <span class="text-center text-red-500">{{ detail.denial_reason }}</span>
+            </div>
+
         {% endfor %}
     
     {% else %}

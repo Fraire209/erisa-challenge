@@ -19,7 +19,6 @@ class Claim(models.Model):
 #Table schema for claim detail data, data can cbe accessed from claim.details.all
 class ClaimDetail(models.Model):
     claim = models.ForeignKey(Claim, on_delete=models.CASCADE, related_name="details") #links this table to the matching claim in the "claims.claim" table. The FK will be a auto generated incremental number starting from 1
-    claim_id_original = models.IntegerField(blank=True, null=True)  # store original claim_id
     denial_reason = models.TextField(blank=True, null=True)
     cpt_codes = models.CharField(max_length=255)  # Storing comma-separated codes
 

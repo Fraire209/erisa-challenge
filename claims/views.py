@@ -41,6 +41,8 @@ def home(request):
     insurers = Claim.objects.values_list('insurer_name', flat=True).distinct()
     statuses = Claim.objects.values_list('status', flat=True).distinct()
 
+
+
     context = {
         "claims": page_obj,
         "q": search_query,

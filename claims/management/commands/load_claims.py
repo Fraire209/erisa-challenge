@@ -11,7 +11,7 @@ class Command(BaseCommand):
             claims_data = json.load(f)
             for item in claims_data:
                 Claim.objects.update_or_create(
-                    claim_id=item['id'],
+                    claim_id=item['id'],                            #checking if claim already exists to update, else it creates
                     defaults={
                         'patient_name': item['patient_name'],
                         'billed_amount': item['billed_amount'],
@@ -27,12 +27,11 @@ class Command(BaseCommand):
             details_data = json.load(f)
             for item in details_data:
                 try:
-                    claim = Claim.objects.get(claim_id=item['claim_id'])
+                    claim = Claim.objects.get(claim_id=item['claim_id'])    #finds matching claim id in Claim table
                     ClaimDetail.objects.update_or_create(
                         id=item['id'],      #django partition key
                         defaults={
-                            'claim': claim,    #will show the PK of the matching claim in the "claims.claim" table
-                            'claim_id_original': item['claim_id'],  # keep original ID in table
+                            'claim': claim,    #will show the PK of the matching claim in the "claims.claim" table, foreign key relation to the Claim object
                             'denial_reason': item['denial_reason'],
                             'cpt_codes': item['cpt_codes'],
                         }

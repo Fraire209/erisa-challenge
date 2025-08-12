@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'claims', #this adds the claims project
+    'django.contrib.humanize', #for number formatting
 ]
 
 MIDDLEWARE = [
