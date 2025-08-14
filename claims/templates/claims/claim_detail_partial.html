@@ -3,7 +3,8 @@
 
 <!-- detail dashboard template -->
 <div>
-    <!-- title and status -->
+
+    <!-- title and status in column flex box to display them side to side -->
     <div class="grid grid-cols-2 gap-4 mb-2 font-semibold">
         <h2 class="text-lg text-blue-800">Claim Details - {{ claim.claim_id }}</h2>
         <p class="justify-self-end inline-block px-2 py-1.5 rounded-2xl   {% if claim.status == 'Denied' %} text-red-900 bg-red-100 {% elif claim.status == 'Paid' %} text-green-500 bg-green-100 {% else %} text-blue-500 bg-blue-100 {% endif %}"> {{ claim.status }}</p> <!-- approved green, denied red, under review blue -->
@@ -40,11 +41,11 @@
     </div>
     
 
-    <!-- searches through claims.details to see if there is associated information to the claim-->
+    <!-- searches through claims.details to output associated information to the claim-->
     {% if claim.details.all %}
         {% for detail in claim.details.all %}
 
-            <div class="flex flex-col items-center mb-4"> <!-- stack children vertically-->
+            <div class="flex flex-col items-center mb-4">                                   <!-- stack children vertically-->
                 <span class="font-semibold text-center text-gray-600">CPT Codes:</span>
                 <span class="text-center font-semibold">{{ detail.cpt_codes }}</span>
             </div>

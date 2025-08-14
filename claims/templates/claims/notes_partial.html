@@ -1,0 +1,77 @@
+
+
+    <!-- Top Box: Notes & Flags -->
+    <div class="bg-gray-100 border border-gray-300 shadow p-4 rounded-2xl flex-1">                        <!-- flex box for overall container shape of the right side-->
+        
+        <div class="grid grid-cols-2 gap-4 mb-2 font-semibold">                                            <!-- inner flex box with two columns to display title and claim next to eachother-->
+            <h3 class="text-lg font-semibold mb-4">Notes & Annotations</h3>
+            <h2 class="text-lg text-blue-800 justify-self-end">Claim - {{ claim.claim_id }}</h2>
+        </div>
+        <!-- Admin Notes -->
+        <div class="flex-1 mb-4 overflow-auto py-2 px-4 bg-white rounded-xl border-l-4 border-blue-900">    <!-- flex box displaying list of notes, if any or else displays no notes -->
+            <h4 class="text-md font-semibold text-blue-900">Admin Notes</h4>
+            <ul class="list-disc list-inside space-y-1">
+                {% for note in claim.notes.all %}
+                    <li>{{ note.text }} 
+                        <span class="text-xs text-gray-400">({{ note.created_at|date:"Y-m-d H:i" }})</span>     <!-- displays the timestamp-->
+                    </li>
+                {% empty %}
+                    <li class="text-gray-500 text-sm">No admin notes available.</li>                            <!-- empty note case -->
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- System Flags WIP -->
+        <div class="flex-1 overflow-auto py-2 px-4 bg-white rounded-xl border-l-4 border-yellow-500">           <!-- flex box to share space evenly with the admin notes flex box-->
+            <h4 class="text-md font-semibold text-yellow-500">System Flags</h4>
+            <p class="text-sm text-gray-500">No flags set by the system</p>
+        </div>
+    </div>
+
+    <!-- Bottom Box: Quick Actions -->
+    <div class="bg-white border border-gray-300 shadow p-4 rounded-2xl flex-1">
+        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>                                           <!-- title -->
+
+        <!-- Alpine.js container, reactive state variable to track whether window is open or not -->
+        <div x-data="{ open: false }" class="flex-1 mt-4 py-2 px-4 rounded-xl border border-gray-100">
+
+            <!-- Add Note button, will open the actual text area when triggered -->
+            <button 
+                @click="open = !open" class="text-gray-500">                                                  <!-- if open, it will set it to false if clicked again to close it-->
+                Add Note                                   
+            </button>
+
+            <!-- Form, initially hidden since open is false, defines the POST method and HTMX for updates, and defines url to be used -->
+            <form 
+                x-show="open" 
+                x-transition 
+                method="POST"
+                hx-post="{% url 'add_note' claim.id %}"
+                hx-target="#notes-panel"
+                hx-swap="innerHTML"
+                class="mt-2"
+            >
+                {% csrf_token %}                                                                <!-- middleware token to prevent 403 forbidden error -->
+                <textarea 
+                    name="text" 
+                    rows="3" 
+                    placeholder="Write your note..." 
+                    class="w-full p-2 border rounded mb-2">
+                </textarea>
+                <button 
+                    type="submit" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    Submit
+                </button>
+            </form>
+
+        </div>
+
+         <!-- Flag for review button WIP -->
+        <div class="flex-1 py-2 px-4 rounded-xl border border-gray-100 mt-2">
+            <button class="text-gray-500">Flag for Review</button>
+        </div>
+        
+    </div>
+
+

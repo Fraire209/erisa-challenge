@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from claims.models import Claim
+from claims.forms import NoteForm
 from django.core.paginator import Paginator
 from django.db.models import Q  # queries
 
@@ -38,7 +39,7 @@ def home(request):
     paginator = Paginator(claims_list, 5)  # 5 rows per page
     page_obj = paginator.get_page(page_number) #gets contents of page 
 
-    insurers = Claim.objects.values_list('insurer_name', flat=True).distinct()
+    insurers = Claim.objects.values_list('insurer_name', flat=True).distinct()  #only stores a single instance of each different insurance name or status for dropdown menu
     statuses = Claim.objects.values_list('status', flat=True).distinct()
 
 
@@ -58,6 +59,26 @@ def home(request):
 
     return render(request, "claims/base.html", context) # returns full page upon initial load
 
+#renders claim detail partial file and passes associated claim
 def claim_detail(request, pk):
     claim = get_object_or_404(Claim, pk=pk)
     return render(request, "claims/claim_detail_partial.html", {"claim": claim})
+
+#POST method
+def add_note(request, pk):
+    claim = get_object_or_404(Claim, pk=pk) #gets claim from Claim with matching pk
+
+    if request.method == "POST":
+        form = NoteForm(request.POST)       #form instance 
+        if form.is_valid():                 #validation
+            note = form.save(commit=False)  #creates object without saving yet
+            note.claim = claim              #links note with associating claim through fk
+            note.save()                     #saves
+    # Return updated notes partial
+    return render(request, "claims/notes_partial.html", {"claim": claim})
+   
+def claim_notes_partial(request, pk):
+    claim = get_object_or_404(Claim, pk=pk)
+    notes = claim.notes.all()             #retrieves all notes associated with claim pk
+    #Return updated notes partial
+    return render(request, "claims/notes_partial.html", {"claim": claim, "notes": notes})

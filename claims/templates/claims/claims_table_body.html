@@ -1,7 +1,6 @@
 
 {% load humanize %} <!-- for number formatting -->
 
-
 <!-- flexbox to stack children vertically -->
 <div class="flex flex-col">
     <!-- table using tailwing css -->
@@ -44,11 +43,11 @@
                 <td class="px-4 py-2">{{ claim.discharge_date }}</td>
                 <td class="px-4 py-2 text-center"> 
                     <!-- htmx setup for claim details dashboard updates through view button -->
-                    <button                                                         
+                   <button
                         hx-get="{% url 'claim_detail_partial' claim.id %}"
                         hx-target="#claim-detail-panel"
                         hx-swap="innerHTML"
-                        class="block  bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+                        class="block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
                         View
                     </button>
                 </td>
@@ -62,12 +61,29 @@
             </tr>
             {% endfor %}
         </tbody>
-        <tfoot>
+        <tfoot> 
             <tr>
             <td colspan="8" class="border-t-2 border-gray-300 p-0"></td>
             </tr>
         </tfoot>
     </table>
+
+<!-- event listener to trigger a ajax request for claim/pk/notes url based on a request to claim detail panel. extracts its claim id -->
+    <script>
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            // Check if the claim detail panel just updated
+            if(evt.target.id === 'claim-detail-panel') {
+                // Extract claim ID from the URL of the response
+                const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/details\//);
+                if(urlMatch){
+                    const claimId = urlMatch[1];
+                    // Trigger HTMX request to update notes panel
+                    htmx.ajax('GET', `/claim/${claimId}/notes/`, {target:'#notes-panel', swap:'innerHTML'});
+                }
+            }
+        });
+    </script>
+
 
     <!-- Pagination controls -->
     <div class="flex justify-between mt-4"> <!-- This flex container keeps first element to the left of page and second to the right for the previous and next buttons -->
@@ -101,14 +117,28 @@
             <span></span>
         {% endif %}
     </div>
-
-
-        <!-- Fixed bottom-left panel -->
-    <div id="claim-detail-panel" class="mt-4 w-1/2 bg-gray-100 border border-gray-300 shadow p-4 rounded-2xl overflow-auto">
-        {% if claims %}
-            {% include "claims/claim_detail_partial.html" with claim=claims.0 %} <!-- this selects the first item in the table as the default -->
-        {% else %}
-            <p>No claim selected.</p> 
-        {% endif %}
-    </div>
 </div>
+
+    <!-- Flex row for left and right containers -->
+    <div class="flex mt-4 gap-4">
+            
+        <!-- Fixed bottom-left panel -->
+        <div id="claim-detail-panel" class="mt-4 w-1/2 bg-gray-100 border border-gray-300 shadow p-4 rounded-2xl overflow-auto">
+            {% if claims %}
+                {% include "claims/claim_detail_partial.html" with claim=claims.0 %} <!-- this selects the first item in the table page as the default -->
+            {% else %}
+                <p>No claim selected.</p> 
+            {% endif %}
+        </div>
+
+        <!-- Right container with two stacked boxes -->
+        <div id="notes-panel" class="w-1/2 flex flex-col gap-4 mt-4">
+            {% if claims %}
+                {% include "claims/notes_partial.html" with claim=claims.0 %} <!-- this selects the first item in the table page as the default -->
+            {% else %}
+                <p>No claim selected.</p> 
+            {% endif %}
+        </div>
+    </div>
+        
+

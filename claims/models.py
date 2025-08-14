@@ -1,5 +1,3 @@
-from django.db import models #should this be on here twice??
-
 # Create your models here.
 from django.db import models
 
@@ -25,3 +23,11 @@ class ClaimDetail(models.Model):
     def __str__(self):
         return f"Details for Claim {self.claim.claim_id}"
 
+#Table schema for claim notes, linked to Claim by fk
+class Note(models.Model):
+    claim = models.ForeignKey(Claim, on_delete=models.CASCADE, related_name="notes")
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Note for Claim {self.claim.claim_id} - {self.text[:20]}"
