@@ -24,11 +24,10 @@
             {% for claim in claims %}
             <!-- for each claim, creates a table row with all the attributes-->
             <tr class="text-left hover:bg-blue-100">
-                <td class="px-4 py-2 font-mono text-blue-800">{{ claim.claim_id }}</td>  
+                <td class="px-4 py-2 font-mono text-blue-800">{{ claim.claim_id }}</td>      <!-- claim id-->
                 <td class="px-4 py-2">{{ claim.patient_name }}</td>
                 <td class="px-4 py-2">${{ claim.billed_amount|floatformat:2|intcomma }}</td> <!-- float number formatting with commas -->
                 <td class="px-4 py-2 {% if claim.paid_amount == 0.00 %}text-red-500{% else %}text-green-500{% endif %}">${{ claim.paid_amount|floatformat:2|intcomma }}</td> <!-- logic goes in tags not inline, paid green, not paid red-->
-              <!--- <td class="justify-self-end inline-block px-10 py-1 rounded-2xl font-semibold {% if claim.status == 'Denied' %} text-red-900 bg-red-100 {% elif claim.status == 'Paid' %} text-green-500 bg-green-100 {% else %} text-blue-500 bg-blue-100 {% endif %}"> {{ claim.status }}</td> <!-- approved green, denied red, under review blue -->
                 <td class="px-4 py-2 text-center align-middle">                                  <!-- approved green, denied red, under review blue, centered and justified inside the span -->
                     <span class="inline-block w-30 h-8 rounded-2xl font-semibold text-sm        
                         {% if claim.status == 'Denied' %} text-red-900 bg-red-100 
@@ -39,18 +38,29 @@
                         {{ claim.status }}                                                      <!-- prevent text wrapping to keep it single lined -->
                     </span>
                 </td>
-                <td class="px-4 py-2">{{ claim.insurer_name }}</td>
-                <td class="px-4 py-2">{{ claim.discharge_date }}</td>
-                <td class="px-4 py-2 text-center"> 
-                    <!-- htmx setup for claim details dashboard updates through view button -->
-                   <button
-                        hx-get="{% url 'claim_detail_partial' claim.id %}"
-                        hx-target="#claim-detail-panel"
-                        hx-swap="innerHTML"
-                        class="block bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
-                        View
-                    </button>
+                <td class="px-4 py-2">{{ claim.insurer_name }}</td>                 <!-- insurer name -->
+                <td class="px-4 py-2">{{ claim.discharge_date }}</td>               <!-- discharge date -->
+                <td class="px-4 py-2 text-center">                                  <!-- view button -->
+                    <div class="inline-flex items-center justify-center gap-2">     <!-- flex container to display flag and view button side by side -->
+                        
+                        <button
+                            hx-get="{% url 'claim_detail_partial' claim.id %}"
+                            hx-target="#claim-detail-panel"
+                            hx-swap="innerHTML"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                        >
+                            View
+                        </button>
+
+                        <span class="w-4 text-yellow-500 text-center">  <!-- Flag placeholder to avoid view button shifting when adding flag icon -->
+                            {% if claim.flags.exists %}
+                                ⚑
+                            {% endif %}
+                        </span>
+
+                    </div>
                 </td>
+
             </tr>
             <!-- empty table case-->
             {% empty %}
@@ -68,23 +78,42 @@
         </tfoot>
     </table>
 
-<!-- event listener to trigger a ajax request for claim/pk/notes url based on a request to claim detail panel. extracts its claim id -->
+    <!-- event listener to trigger a ajax request for claim/pk/notes url based on a request to claim detail panel. extracts its claim id -->
     <script>
-        document.body.addEventListener('htmx:afterSwap', function(evt) {
-            // Check if the claim detail panel just updated
-            if(evt.target.id === 'claim-detail-panel') {
-                // Extract claim ID from the URL of the response
+    
+        // Listener for when claim detail panel updates, hx-on:afterRequest did not work
+        document.body.addEventListener('htmx:afterSwap', function(evt) {                                    //works for max of two urls else it skips one
+            if(evt.target.id === 'claim-detail-panel'){
                 const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/details\//);
                 if(urlMatch){
                     const claimId = urlMatch[1];
-                    // Trigger HTMX request to update notes panel
+
+                    // Update notes panel
                     htmx.ajax('GET', `/claim/${claimId}/notes/`, {target:'#notes-panel', swap:'innerHTML'});
+
+                    // Update flag panel
+                    htmx.ajax('GET', `/claim/${claimId}/flags/`, {target:'#flag-panel', swap:'innerHTML'});
                 }
             }
         });
+
+        // Listener for when flag panel updates, then update actions panel                                      //second listner to make sure ALL urls are invoked
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            if(evt.target.id === 'flag-panel'){
+                const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/flags\//);
+                if(urlMatch){
+                    const claimId = urlMatch[1];
+
+                    // Update actions panel after flag panel is loaded
+                    htmx.ajax('GET', `/claim/${claimId}/actions/`, {target:'#quick-actions-panel', swap:'innerHTML'});
+                }
+            }
+        });
+
+        
     </script>
 
-
+     
     <!-- Pagination controls -->
     <div class="flex justify-between mt-4"> <!-- This flex container keeps first element to the left of page and second to the right for the previous and next buttons -->
 
@@ -119,26 +148,50 @@
     </div>
 </div>
 
-    <!-- Flex row for left and right containers -->
-    <div class="flex mt-4 gap-4">
-            
-        <!-- Fixed bottom-left panel -->
-        <div id="claim-detail-panel" class="mt-4 w-1/2 bg-gray-100 border border-gray-300 shadow p-4 rounded-2xl overflow-auto">
-            {% if claims %}
-                {% include "claims/claim_detail_partial.html" with claim=claims.0 %} <!-- this selects the first item in the table page as the default -->
-            {% else %}
-                <p>No claim selected.</p> 
-            {% endif %}
+<!-- Flex row for left and right containers -->
+<div class="flex mt-4 gap-4">
+
+    <!-- Fixed bottom-left panel -->
+    <div id="claim-detail-panel" class="mt-4 w-1/2 bg-gray-100 border border-gray-300 shadow p-4 rounded-2xl overflow-auto">
+        {% if claims %}
+            {% include "claims/claim_detail_partial.html" with claim=claims.0 %}
+        {% else %}
+            <p>No claim selected.</p> 
+        {% endif %}
+    </div>
+
+    <!-- Right: Two main vertical containers -->
+    <div class="w-1/2 flex flex-col gap-2">
+
+        <!-- top container with two stacked boxes inside of it  -->
+        <div class=" flex flex-col  bg-gray-100 mt-4 border border-gray-300 shadow  p-4 rounded-2xl flex-1">
+
+            <!-- Notes panel -->
+            <div id="notes-panel">
+                {% if claims %}
+                    {% include "claims/notes_partial.html" with claim=claims.0 %}
+                {% else %}
+                    <p>No claim selected.</p> 
+                {% endif %}
+            </div>
+
+            <!-- Flag panel -->
+            <div id="flag-panel">
+                {% if claims %}
+                    {% include "claims/flag_partial.html" with claim=claims.0 %}
+                {% else %}
+                    <p>No flags set.</p>
+                {% endif %}
+            </div>
+        </div>
+        <!-- bottom container div -->
+        <div id="quick-actions-panel">
+                {% include "claims/actions_partial.html" with claim=claims.0 %}
         </div>
 
-        <!-- Right container with two stacked boxes -->
-        <div id="notes-panel" class="w-1/2 flex flex-col gap-4 mt-4">
-            {% if claims %}
-                {% include "claims/notes_partial.html" with claim=claims.0 %} <!-- this selects the first item in the table page as the default -->
-            {% else %}
-                <p>No claim selected.</p> 
-            {% endif %}
-        </div>
     </div>
+
+</div>
+
         
 

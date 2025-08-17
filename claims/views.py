@@ -1,13 +1,14 @@
 from django.shortcuts import render, get_object_or_404
-from claims.models import Claim
+from claims.models import Claim,SystemFlag
 from claims.forms import NoteForm
 from django.core.paginator import Paginator
 from django.db.models import Q  # queries
 
+#default view, renders the table and the pagination controls
 def home(request):
     search_query = request.GET.get("q", "")
     page_number = request.GET.get("page", 1)
-    claims_list = Claim.objects.all().order_by("id").prefetch_related('details')  # Order for consistency and fetches the associated details from ClaimDetails
+    claims_list = Claim.objects.all().order_by("id").prefetch_related('details','flags')  # Order for consistency and fetches the associated details from ClaimDetails
     selected_insurer = request.GET.get("insurer", "")
     selected_status = request.GET.get("status", "")
 
@@ -43,7 +44,7 @@ def home(request):
     statuses = Claim.objects.values_list('status', flat=True).distinct()
 
 
-
+    #information passed to the partial
     context = {
         "claims": page_obj,
         "q": search_query,
@@ -55,7 +56,7 @@ def home(request):
 
     if request.headers.get("HX-Request"):  
         # If request comes from HTMX, return only the table body
-        return render(request, "claims/claims_table_body.html", context)
+        return render(request, "claims/claims_table_body.html", context) #avoids rerendering the search and filter sections
 
     return render(request, "claims/base.html", context) # returns full page upon initial load
 
@@ -64,7 +65,7 @@ def claim_detail(request, pk):
     claim = get_object_or_404(Claim, pk=pk)
     return render(request, "claims/claim_detail_partial.html", {"claim": claim})
 
-#POST method
+#POST method for notes
 def add_note(request, pk):
     claim = get_object_or_404(Claim, pk=pk) #gets claim from Claim with matching pk
 
@@ -76,9 +77,35 @@ def add_note(request, pk):
             note.save()                     #saves
     # Return updated notes partial
     return render(request, "claims/notes_partial.html", {"claim": claim})
-   
+
+#renders notes panel
 def claim_notes_partial(request, pk):
     claim = get_object_or_404(Claim, pk=pk)
     notes = claim.notes.all()             #retrieves all notes associated with claim pk
     #Return updated notes partial
     return render(request, "claims/notes_partial.html", {"claim": claim, "notes": notes})
+
+#POST method for flags
+def add_flag(request, pk):
+    claim = get_object_or_404(Claim, pk=pk)
+
+    # Create the flag
+    SystemFlag.objects.create(
+        claim=claim,
+        message="Review Recommended"  # must match model field "message"
+    )
+
+    # Return updated flag panel for HTMX
+    flags = claim.flags.all() 
+    return render(request, "claims/flag_partial.html", {"claim": claim, "flags": flags})
+
+#renders the flag panel 
+def flag_partial(request, pk):
+    claim = get_object_or_404(Claim, pk=pk)
+    flags = claim.flags.all()
+    return render(request, "claims/flag_partial.html", {"claim": claim, "flags": flags})
+
+#renders the quick actions panel
+def quick_actions_partial(request, pk):
+    claim = get_object_or_404(Claim, pk=pk)
+    return render(request, "claims/actions_partial.html", {"claim": claim})
