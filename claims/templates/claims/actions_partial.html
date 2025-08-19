@@ -37,20 +37,46 @@
 
         </div>
         
-      <!-- flag claim, message is coded in view function -->
+      <!-- flag claim, message is coded in view function, two possible urls to either remove or add the flag to the flag pannel using htmx -->
         <div class="flex-1 mt-4 py-2 px-4 rounded-xl border border-gray-100">
             <form 
                 method="POST"
-                hx-post="{% url 'add_flag' claim.id %}"  
+                hx-post="{% if claim.flags.exists %}{% url 'remove_flag' claim.id %}{% else %}{% url 'add_flag' claim.id %}{% endif %}"  
                 hx-target="#flag-panel"                        
                 hx-swap="innerHTML"                             
                 class="flex gap-2"
             >
                 {% csrf_token %}
                 <button type="submit" class="text-gray-500">
-                    Flag for Review
+                    {% if claim.flags.exists %}
+                        Remove Flag
+                    {% else %}
+                        Flag for Review
+                    {% endif %}
                 </button>
             </form>
+
         </div>
         
     </div>
+
+    <!-- this listener waits for the flag-panel to be targeted, then takes the claim id from the two possible urls being called to update the flag button -->
+<script>
+    
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+    const targetId = evt.target.id;                                         //waits for 'flag-panel' to be the evt target
+
+    if (targetId === 'flag-panel') {
+        const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/(add|remove)-flag/); //used to extract the claim id from the url being called, with two possible options
+        if (urlMatch) {
+            const claimId = urlMatch[1];
+
+            // Trigger the actions partial to update the button
+            htmx.ajax('GET', `/claim/${claimId}/actions/`, {target: '#quick-actions-panel', swap: 'innerHTML'});
+        }
+    }
+});
+
+
+
+</script>

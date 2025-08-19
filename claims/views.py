@@ -106,6 +106,13 @@ def add_flag(request, pk):
     flags = claim.flags.all() 
     return render(request, "claims/flag_partial.html", {"claim": claim, "flags": flags})
 
+#removes flag from claim
+def remove_flag(request, pk):
+    claim = get_object_or_404(Claim, pk=pk)
+    claim.flags.all().delete()  # remove all flags for this claim
+    flags = claim.flags.all()
+    return render(request, "claims/flag_partial.html", {"claim": claim, "flags": flags})
+
 #renders the flag panel 
 def flag_partial(request, pk):
     claim = get_object_or_404(Claim, pk=pk)
