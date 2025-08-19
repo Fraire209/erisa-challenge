@@ -6,13 +6,13 @@ class Command(BaseCommand):
     help = 'Clears all rows from a table and resets its auto-increment ID'
 
     def add_arguments(self, parser):
-        parser.add_argument('model', type=str, help='App label and model name, e.g., myapp.Note')
+        parser.add_argument('model', type=str) #App label and model name, e.g., myapp.Note
 
     def handle(self, *args, **options):
         model_path = options['model']
         try:
-            app_label, model_name = model_path.split('.')
-            model = apps.get_model(app_label, model_name)
+            app_label, model_name = model_path.split('.')      #split app name from model name with '.' as delimiter e.g. claims.Note
+            model = apps.get_model(app_label, model_name)      #gets actual model from app
         except (ValueError, LookupError):
             self.stderr.write(self.style.ERROR('Invalid model. Use format: app_label.ModelName'))
             return
@@ -23,6 +23,6 @@ class Command(BaseCommand):
         # Reset auto-increment
         table_name = model._meta.db_table
         with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM sqlite_sequence WHERE name=%s;", [table_name])
+            cursor.execute("DELETE FROM sqlite_sequence WHERE name=%s;", [table_name])          #SQL command to delete sequence 
 
         self.stdout.write(self.style.SUCCESS(f'Table {table_name} cleared and auto-increment reset.'))

@@ -1,6 +1,6 @@
 # Create your models here.
 from django.db import models
-
+from django.contrib.auth.models import User
 #Table schema for claim list
 class Claim(models.Model):
     claim_id = models.IntegerField(unique=True)          
@@ -23,11 +23,12 @@ class ClaimDetail(models.Model):
     def __str__(self):
         return f"Details for Claim {self.claim.claim_id}"
 
-#Table schema for claim notes, linked to Claim by fk
+#Table schema for claim notes, linked to Claim by fk and user fk
 class Note(models.Model):
     claim = models.ForeignKey(Claim, on_delete=models.CASCADE, related_name="notes")
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notes", null=True, blank=True)
 
     def __str__(self):
         return f"Note for Claim {self.claim.claim_id} - {self.text[:20]}"

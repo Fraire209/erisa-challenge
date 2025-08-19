@@ -12,6 +12,23 @@
 <body class="bg-gray-50 p-6">
 
     <h1 class="text-2xl text-center font-bold mb-4">Claims Management System</h1> <!-- table title -->
+    <!-- flex container to display welcome message and logout button horizontally -->
+    {% if user.is_authenticated %}
+       <div class="flex items-center gap-2 mb-4">
+            <span class="font-semibold">Welcome, {{ user.username }} |</span>   
+            <!-- post method for logout button -->
+            <form method="post" action="{% url 'logout' %}" class="m-0 p-0">
+                {% csrf_token %}
+                <button type="submit" class="text-blue-600 bg-transparent p-0 border-0 cursor-pointer">
+                    Logout
+                </button>
+            </form>
+        </div>
+    <!-- displays login button if page is somehow accessed without log in-->
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+
 
     <!-- x-data initializes an alpine reactive state variable named open set to false, tracking whether filter dropdown is open or not.
         Clicking outside of the panel (form) sets the variable back to false to close it -->

@@ -1,0 +1,36 @@
+{% extends "login_base.html" %}
+
+{% block content %}
+<div class="max-w-md w-full p-6 bg-white rounded-xl shadow">                     <!-- sets with to 448px with w-md, uses full with-->
+  <h1 class="text-xl font-bold mb-4">Sign Up</h1>                                       <!-- title -->
+
+  {% for message in messages %}
+    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">{{ message }}</div>
+  {% endfor %}
+
+  <!-- for inputs-->
+  <form method="post" class="flex flex-col gap-4">
+    {% csrf_token %}
+    
+    <!-- username (Full name)-->
+    <div class="flex flex-col">
+    <label class="font-medium mb-1">Name:</label>
+    <input type="text" name="username"  class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+    
+    <!-- password -->
+    <div class="flex flex-col">
+    <label class="font-medium mb-1">Password:</label>
+    <input type="password" name="password" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+    
+    <!-- submit button -->
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-2">Sign Up</button>
+  </form>
+
+  <!-- redirect to login if already have an accoint -->
+  <p class="mt-4">
+    Already have an account? <a href="{% url 'login' %}" class="text-blue-600">Log in</a>
+  </p>
+</div>
+{% endblock %}

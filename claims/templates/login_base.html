@@ -1,0 +1,14 @@
+<!-- used to define a layout for login template-->
+<!DOCTYPE html>
+<html lang="en" class="h-full"> <!-- use entire viewport for layout purposes-->
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Login{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>         <!-- import tailwind -->
+</head>
+<body class="h-full">
+    <div class="login-container min-h-screen flex items-center justify-center bg-gray-100"> <!-- takes full height of viewport, centers it vertically and horizontally-->
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

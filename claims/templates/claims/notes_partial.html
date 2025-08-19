@@ -1,25 +1,26 @@
-
-
-    <!-- Top Box: Notes & Flags -->                       <!-- flex box for overall container shape of the right side-->
-        <div class="grid grid-cols-2 gap-4  font-semibold">                                            <!-- inner flex box with two columns to display title and claim next to eachother-->
-            <h3 class="text-lg font-semibold mb-4">Notes & Annotations</h3>
-            <h2 class="text-lg text-blue-800 justify-self-end">Claim - {{ claim.claim_id }}</h2>
-        </div>
+<!-- Top Box: Notes & Flags -->                       <!-- flex box for overall container shape of the right side-->
+    <div class="grid grid-cols-2 gap-4  font-semibold">                                            <!-- inner flex box with two columns to display title and claim next to eachother-->
+        <h3 class="text-lg font-semibold mb-4">Notes & Annotations</h3>
+        <h2 class="text-lg text-blue-800 justify-self-end">Claim - {{ claim.claim_id }}</h2>
+    </div>
         <!-- Admin Notes -->
-        <div class="flex-1 mb-2 overflow-auto py-2 px-4 bg-white rounded-xl border-l-4 border-blue-900">    <!-- flex box displaying list of notes, if any or else displays no notes -->
-            <h4 class="text-md font-semibold text-blue-900">Admin Notes</h4>
-            <ul class="list-disc list-inside space-y-1">
-                {% for note in claim.notes.all %}
-                    <li>{{ note.text }} 
-                        <span class="text-xs text-gray-400">({{ note.created_at|date:"Y-m-d H:i" }})</span>     <!-- displays the timestamp-->
-                    </li>
-                {% empty %}
-                    <li class="text-gray-500 text-sm">No admin notes available.</li>                            <!-- empty note case -->
-                {% endfor %}
-            </ul>
-        </div>
-
-
+    <div class="flex-1 mb-2 overflow-auto py-2 px-4 bg-white rounded-xl border-l-4 border-blue-900">    <!-- flex container and color stylization-->
+        <h4 class="text-md font-semibold text-blue-900">Admin Notes</h4>                                <!-- container heading -->
+        
+        <ul class="list-disc list-inside space-y-1">                                                    <!-- unorderd list with bullet points-->
+            {% for note in claim.notes.all %}                                                           <!-- displays all notes for specific claim-->
+                <li>
+                    {{ note.text }}                                                                     <!-- text portion of the Note form-->
+                    <span class="text-xs text-gray-500">
+                        — {{ note.created_by.username }}                                                <!-- display user --> 
+                        <span class="text-gray-400">({{ note.created_at|date:"Y-m-d H:i" }})</span>     <!-- displays time created-->
+                    </span>
+                </li>
+            {% empty %}                                                                                 <!-- no notes case -->
+                <li class="text-gray-500 text-sm">No admin notes available.</li>
+            {% endfor %}
+        </ul>
+    </div>
     
 
 

@@ -1,10 +1,15 @@
-from django.shortcuts import render, get_object_or_404
-from claims.models import Claim,SystemFlag
-from claims.forms import NoteForm
-from django.core.paginator import Paginator
+from django.shortcuts import render, get_object_or_404, redirect
+from claims.models import Claim,SystemFlag  #tables
+from claims.forms import NoteForm   #form template for claim notes
+from django.core.paginator import Paginator #split table into pages
 from django.db.models import Q  # queries
+from django.contrib.auth.decorators import login_required #make users log in to use the system
+from django.contrib.auth.models import User #built in user model, only using username and password fields
+from django.contrib import messages #allows for messages from views to templates
+from django.contrib.auth import login #attaches user to session, allows for request.user
 
 #default view, renders the table and the pagination controls
+@login_required     #forces log in 
 def home(request):
     search_query = request.GET.get("q", "")
     page_number = request.GET.get("page", 1)
@@ -74,6 +79,7 @@ def add_note(request, pk):
         if form.is_valid():                 #validation
             note = form.save(commit=False)  #creates object without saving yet
             note.claim = claim              #links note with associating claim through fk
+            note.created_by = request.user  #links to logged in user throguh django middleware
             note.save()                     #saves
     # Return updated notes partial
     return render(request, "claims/notes_partial.html", {"claim": claim})
@@ -89,11 +95,12 @@ def claim_notes_partial(request, pk):
 def add_flag(request, pk):
     claim = get_object_or_404(Claim, pk=pk)
 
-    # Create the flag
-    SystemFlag.objects.create(
-        claim=claim,
-        message="Review Recommended"  # must match model field "message"
-    )
+    # Only create a flag if one doesn't already exist
+    if not claim.flags.exists():
+        SystemFlag.objects.create(
+            claim=claim,
+            message="Potential underpayment detected - review recommended."  # must match model field "message"
+        )
 
     # Return updated flag panel for HTMX
     flags = claim.flags.all() 
@@ -109,3 +116,26 @@ def flag_partial(request, pk):
 def quick_actions_partial(request, pk):
     claim = get_object_or_404(Claim, pk=pk)
     return render(request, "claims/actions_partial.html", {"claim": claim})
+
+#renders the signup view page, logic for adding a user
+def signup_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        #requires both fields
+        if not username or not password:
+            messages.error(request, "Please provide both username and password.")
+        
+        #requires uniqure username 
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+        
+        #successful registration
+        else:
+            user = User.objects.create_user(username=username, password=password)
+            login(request, user)  # logs in immediately
+            return redirect("home") #redirects to home view
+    
+    #renders page again if there was an error
+    return render(request, "registration/signup.html")

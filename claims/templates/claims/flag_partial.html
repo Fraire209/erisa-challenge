@@ -3,13 +3,13 @@
     <h4 class="text-md font-semibold text-yellow-500">System Flags</h4> <!-- container heading -->
 
     <!-- loop throguh flags to display as a list or else display no flags message-->
-    {% if flags %}
-        <ul class="text-sm text-gray-700 list-disc ">
-            {% for flag in flags %}
+        <ul class="text-sm text-gray-700 list-disc list-inside space-y-1">
+            {% for flag in flags %}                                             <!-- loops through all flags of specific claim to output -->
                 <li>{{ flag.message }}</li>
+
+            <!-- empty case-->
+            {%empty%}
+                <li class="text-sm text-gray-500">No flags set by the system</li>
             {% endfor %}
         </ul>
-    {% else %}
-        <p class="text-sm text-gray-500">No flags set by the system</p>
-    {% endif %}
 </div>
