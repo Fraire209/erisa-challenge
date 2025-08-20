@@ -1,3 +1,4 @@
+{% load tz %}       <!-- used for localtime conversion of timestamp -->
 <!-- Top Box: Notes & Flags -->                       <!-- flex box for overall container shape of the right side-->
     <div class="grid grid-cols-2 gap-4  font-semibold">                                            <!-- inner flex box with two columns to display title and claim next to eachother-->
         <h3 class="text-lg font-semibold mb-4">Notes & Annotations</h3>
@@ -12,8 +13,8 @@
                 <li>
                     {{ note.text }}                                                                     <!-- text portion of the Note form-->
                     <span class="text-xs text-gray-500">
-                        — {{ note.created_by.username }}                                                <!-- display user --> 
-                        <span class="text-gray-400">({{ note.created_at|date:"Y-m-d H:i" }})</span>     <!-- displays time created-->
+                        — {{ note.created_by.get_full_name }}                                           <!-- display user full name --> 
+                        <span class="text-gray-400">({{ note.created_at|localtime|date:"m/d/Y g:i A" }})</span>     <!-- displays timestamp, converted to chicago timezone from utc, h is 12 hour clock, A is capital AM/PM, g no leading 0s -->
                     </span>
                 </li>
             {% empty %}                                                                                 <!-- no notes case -->

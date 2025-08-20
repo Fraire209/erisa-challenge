@@ -127,12 +127,17 @@ def quick_actions_partial(request, pk):
 #renders the signup view page, logic for adding a user
 def signup_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
+        firstname = request.POST.get("firstname", "").strip().title()   #first and last name used for display purposes
+        lastname =  request.POST.get("lastname", "").strip().title()    #strip().title() capitalizes the first letter and makes the rest lowercase
+        username = request.POST.get("username")                         #allows for a custom username now that first and last name are separate fields
         password = request.POST.get("password")
 
         #requires both fields
-        if not username or not password:
-            messages.error(request, "Please provide both username and password.")
+        if not firstname or not lastname:
+            messages.error(request, "Please provide both first and last name.")
+
+        if not firstname or not lastname or not username or not password:
+            messages.error(request, "Please provide all of the fields")
         
         #requires uniqure username 
         elif User.objects.filter(username=username).exists():
@@ -140,7 +145,7 @@ def signup_view(request):
         
         #successful registration
         else:
-            user = User.objects.create_user(username=username, password=password)
+            user = User.objects.create_user(username=username, password=password, first_name=firstname, last_name=lastname)
             login(request, user)  # logs in immediately
             return redirect("home") #redirects to home view
     
