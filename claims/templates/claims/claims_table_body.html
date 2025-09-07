@@ -40,21 +40,30 @@
                 </td>
                 <td class="px-4 py-2">{{ claim.insurer_name }}</td>                 <!-- insurer name -->
                 <td class="px-4 py-2">{{ claim.discharge_date }}</td>               <!-- discharge date -->
-                <td class="px-4 py-2 text-center">                                  <!-- view button -->
+                <td>                                  <!-- view button -->
                     <div class="inline-flex items-center justify-center gap-2">     <!-- flex container to display flag and view button side by side -->
                         
                         <button
                             hx-get="{% url 'claim_detail_partial' claim.id %}"
                             hx-target="#claim-detail-panel"
                             hx-swap="innerHTML"
-                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                        >
+                            class=" text-gray-500 border border-gray-300 px-3 py-1 gap-2 rounded flex items-center">
+                        <!-- eye svg icon-->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z">
+                        </svg>
+
                             View
                         </button>
 
-                        <span class="w-4 text-yellow-500 text-center">  <!-- Flag placeholder to avoid view button shifting when adding flag icon -->
+                        <span class="text-yellow-500 text-center px-4">  <!-- Flag placeholder to avoid view button shifting when adding flag icon -->
                             {% if claim.flags.exists %}
-                                ⚑
+                                <!-- flag svg icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                                </svg>
+
                             {% endif %}
                         </span>
 
