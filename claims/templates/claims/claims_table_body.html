@@ -118,10 +118,10 @@
     <div class="flex justify-between mt-4"> <!-- This flex container keeps first element to the left of page and second to the right for the previous and next buttons -->
 
         <!-- only displays previous button if there are previous pages and keeps  -->
-        <!-- swaps only the tables content, but keeps search input -->
+        <!-- swaps only the tables content, but keeps search input, selected insurer, and selected status if they exist -->
         {% if claims.has_previous %}
             <button 
-                hx-get="?page={{ claims.previous_page_number }}&q={{ request.GET.q|urlencode }}"
+                hx-get="?page={{ claims.previous_page_number }}&q={{ q|urlencode }}&insurer={{ selected_insurer|urlencode }}&status={{ selected_status|urlencode }}"
                 hx-target="#claims-table" 
                 hx-swap="innerHTML"
                 class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
@@ -135,7 +135,7 @@
         <!-- only displays next button if there are more pages -->
         {% if claims.has_next %}
             <button 
-                hx-get="?page={{ claims.next_page_number }}&q={{ request.GET.q|urlencode }}"
+                hx-get="?page={{ claims.next_page_number }}&q={{ q|urlencode }}&insurer={{ selected_insurer|urlencode }}&status={{ selected_status|urlencode }}"
                 hx-target="#claims-table"
                 hx-swap="innerHTML"
                 class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
@@ -192,6 +192,3 @@
     </div>
 
 </div>
-
-        
-

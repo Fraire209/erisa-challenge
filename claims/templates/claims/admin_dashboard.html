@@ -1,0 +1,88 @@
+{% load humanize %} <!-- for number formatting -->
+
+<!-- entire report div-->
+<div class = "bg-gray-100 mt-4 border border-gray-300 shadow  p-4 rounded-2xl">
+    <h1 class="text-2xl text-center font-bold mb-4">Admin Report </h1>              <!-- heading -->
+
+    <!-- Summary Cards, 5 colums for larger screens -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div class="bg-white p-4 rounded shadow text-center">                           <!-- total claims -->
+            <p class="text-gray-500">Total Claims</p>
+            <p class="text-2xl font-bold">{{ total_claims|intcomma }}</p>               <!-- intcomma adds comma in correct place for formatting -->
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">                           <!-- paid claims -->
+            <p class="text-gray-500">Paid Claims %</p>
+            <p class="text-2xl font-bold text-green-500">{{ paid_percentage }}%</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">                           <!-- denied claims -->
+            <p class="text-gray-500">Denied Claims %</p>
+            <p class="text-2xl font-bold text-red-500">{{ denied_percentage }}%</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">                           <!-- flagged claims -->
+            <p class="text-gray-500">Flagged Claims</p>
+            <p class="text-2xl font-bold text-yellow-500">{{ total_flags }}</p>
+        </div>
+        <div class="bg-white p-4 rounded shadow text-center">                           <!-- billed vs. paid -->
+            <p class="text-gray-500">Avg. Billed vs Paid</p>
+            <p class="text-xl font-semibold">${{ avg_billed|floatformat:2|intcomma }} / ${{ avg_paid|floatformat:2|intcomma }}</p>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Claims by Status -->
+        <div class="bg-white p-4 rounded shadow pb-12" style="height: 300px;">
+            <h2 class="font-bold mb-2 text-center pb-4">Claims by Status</h2>
+            <canvas id="statusChart"></canvas>
+        </div>
+
+        <!-- Claims by Insurer -->
+        <div class="bg-white p-4 rounded shadow pb-12" style="height: 300px;">
+            <h2 class="font-bold mb-2 text-center pb-4">Claims by Insurer</h2>
+            <canvas id="insurerChart"></canvas>
+        </div>
+
+    </div>
+
+
+    <!-- Chart.js script -->
+    <script>  
+        // Status Pie Chart in defined canvas id
+        var statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: {{ status_labels|safe }},   //denied, paid, under review
+                datasets: [{
+                    data: {{ status_counts|safe }},
+                    backgroundColor: ['#fca5a5','#86efac','#93c5fd'] 
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // fits parent div
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // Insurer Pie Chart in defined canvas id
+        var insurerCtx = document.getElementById('insurerChart').getContext('2d');
+        new Chart(insurerCtx, {
+            type: 'pie',
+            data: {
+                labels: {{ insurer_labels|safe }},  //aetna, bluecross, cigna, self, united
+                datasets: [{
+                    data: {{ insurer_counts|safe }},
+                    backgroundColor: ['#f58989ff', '#7eaaf1ff','#f1d97bff','#68dfb7ff','#ac8ef2ff']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // fits parent div
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    </script>
+
+</div>

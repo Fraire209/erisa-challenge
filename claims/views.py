@@ -1,12 +1,12 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from claims.models import Claim,SystemFlag  #tables
 from claims.forms import NoteForm   #form template for claim notes
 from django.core.paginator import Paginator #split table into pages
-from django.db.models import Q  # queries
+from django.db.models import Q, Count, Avg  # queries and math 
 from django.contrib.auth.decorators import login_required #make users log in to use the system
 from django.contrib.auth.models import User #built in user model, only using username and password fields
 from django.contrib import messages #allows for messages from views to templates
-from django.contrib.auth import login #attaches user to session, allows for request.user
+from django.contrib.auth import login #attaches user to session, allows for request.user and instant login
 
 #default view, renders the table and the pagination controls
 @login_required     #forces log in 
@@ -126,6 +126,7 @@ def quick_actions_partial(request, pk):
 
 #renders the signup view page, logic for adding a user
 def signup_view(request):
+    
     if request.method == "POST":
         firstname = request.POST.get("firstname", "").strip().title()   #first and last name used for display purposes
         lastname =  request.POST.get("lastname", "").strip().title()    #strip().title() capitalizes the first letter and makes the rest lowercase
@@ -145,9 +146,54 @@ def signup_view(request):
         
         #successful registration
         else:
-            user = User.objects.create_user(username=username, password=password, first_name=firstname, last_name=lastname)
-            login(request, user)  # logs in immediately
-            return redirect("home") #redirects to home view
+            User.objects.create_user(username=username, password=password, first_name=firstname, last_name=lastname) #creates user
+            messages.success(request, "Account created successfully! Please return to log in page.")
     
     #renders page again if there was an error
     return render(request, "registration/signup.html")
+
+#admin dashboard
+def admin_dashboard(request):
+    #loads all claims
+    claims = Claim.objects.all()
+    total_claims = claims.count()   #counts number of claims
+    paid_claims = claims.filter(status='Paid').count()     #counts number of Paid status claims
+    denied_claims = claims.filter(status='Denied').count() #coutns number of Denied status claims
+
+    #loads all flags
+    flags = SystemFlag.objects.all()
+    total_flags =  flags.count()    #counts number of flags
+
+    # Percentages of paid and denied claims
+    paid_percentage = round((paid_claims / total_claims) * 100, 1) 
+    denied_percentage = round((denied_claims / total_claims) * 100, 1) 
+
+    # Averages
+    avg_billed = claims.aggregate(avg_billed=Avg('billed_amount'))['avg_billed'] #returns dict, value is in avg_billed
+    avg_paid = claims.aggregate(avg_paid=Avg('paid_amount'))['avg_paid']
+
+    # Claims by status
+    status_data = claims.values('status').annotate(count=Count('id'))
+    status_labels = [s['status'] for s in status_data]      #stores different status labels
+    status_counts = [s['count'] for s in status_data]       #stores count for each different status
+
+    # Claims by insurer
+    insurer_data = claims.values('insurer_name').annotate(count=Count('id'))
+    insurer_labels = [i['insurer_name'] for i in insurer_data]  #stores different insurer names
+    insurer_counts = [i['count'] for i in insurer_data]         #stores count for each insurer
+
+    context = {
+        'total_claims': total_claims,
+        'paid_percentage': paid_percentage,
+        'denied_percentage': denied_percentage,
+        'avg_billed': avg_billed,
+        'avg_paid': avg_paid,
+        'total_flags': total_flags,
+        'status_labels': status_labels,
+        'status_counts': status_counts,
+        'insurer_labels': insurer_labels,
+        'insurer_counts': insurer_counts,
+    }
+
+    #renders the admin dashboard with the corresponding values 
+    return render(request, 'claims/admin_dashboard.html', context)

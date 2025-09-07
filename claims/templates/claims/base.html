@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"> <!-- tailwind css -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script> <!-- htmx -->
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script> <!-- alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>   <!-- chart.js -->
 
 </head>
 
@@ -47,7 +48,7 @@
                 id="search"
                 placeholder="Search claims..."
                 value="{{ q }}"
-                class="w-3/4 px-4 py-2 border rounded"
+                class="flex-grow px-4 py-2 border rounded"
                 autocomplete="off"
             />
 
@@ -57,9 +58,7 @@
                 @click="open = !open"
                 class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Filter</button>
 
-            <button
-            type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Apply</button>
+            
         </div>
 
         <!-- shows the pannel only when open is true, x-transition adds visual effect-->
@@ -82,7 +81,7 @@
 
             <!-- selected attribute is added to keep the user selection in the filter dropdown even after page updates for both insurer and staturs-->
 
-            <label class="block mb-2">
+            <label class="block mb-6">
             Status:
             <select name="status" class="mt-1 px-3 py-2 border rounded w-full">
                 <option value="">All Statuses</option>
@@ -94,17 +93,18 @@
             </select>
             </label>
 
+            <button
+            type="submit"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Apply
+            </button>
+
         </div>
     </form>
 
 
 
-    <!-- HTMX table setup 
-        loads frome home url
-        on fetch load the table
-        target is claims-table
-        swap the html
-    --> 
+    <!-- HTMX table setup, loads frome home url, on fetch load the table target is claims-table to swap the inner html --> 
     <div    id="claims-table" 
             hx-get="{% url 'home' %}"   
             hx-trigger="load"  
@@ -113,6 +113,14 @@
 
             <!-- claims table and pagination controls -->
             {% include "claims/claims_table_body.html" %}
+    </div>
+    
+
+    <!-- admin panel section, will be empty until triggered by button in actions_partial -->
+    <div    id="admin-panel"
+            hx-target="#admin-panel"
+            hx-swap="innerHTML">
+    
     </div>
 
 </body>

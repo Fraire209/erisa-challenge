@@ -58,7 +58,20 @@
 
         </div>
         
+        <!-- generate report button, calls admin_dashboard partial to update div-->
+        <div class="flex-1 mt-4 py-2 px-4 rounded-xl border border-gray-100">
+            <button class="text-gray-500"
+                hx-get="{% url 'admin_dashboard' %}"   
+                hx-target="#admin-panel"          
+                hx-swap="innerHTML"
+            >
+                Generate Report
+            </button>
+        </div>
+
     </div>
+
+
 
     <!-- this listener waits for the flag-panel to be targeted, then takes the claim id from the two possible urls being called to update the flag button -->
 <script>
