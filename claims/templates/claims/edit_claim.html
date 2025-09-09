@@ -1,0 +1,42 @@
+
+    <!-- Success message area -->
+    <div id="edit-claim-message">
+        {% if success %}
+        <div class="px-4 py-2 mb-2 text-green-700 bg-green-100 rounded">
+            {{ success }}
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- edit claim form -->
+    <form method="POST"
+          hx-post="{% url 'edit_claim' claim.id %}"
+          hx-target="#edit-panel"
+          hx-swap="innerHTML"
+          x-show="open"
+          class="space-y-4">
+        {% csrf_token %}                            <!-- middleware token -->
+
+        <!-- two columns to reduce size -->
+        <div class="grid grid-cols-2 gap-2">
+            <!-- Claim fields -->
+            <div>{{ form.patient_name.label_tag }} {{ form.patient_name }}</div>
+            <div>{{ form.discharge_date.label_tag }} {{ form.discharge_date }}</div>
+            <div>{{ form.billed_amount.label_tag }} {{ form.billed_amount }}</div>
+            <div>{{ form.paid_amount.label_tag }} {{ form.paid_amount }}</div>
+            <div>{{ form.insurer_name.label_tag }} {{ form.insurer_name }}</div>
+            <!-- ClaimDetail fields -->
+            <div>{{ form.cpt_codes.label_tag }} {{ form.cpt_codes }}</div>
+            <div>{{ form.denial_reason.label_tag }} {{ form.denial_reason }}</div>
+            <div>{{ form.append_mode.label_tag }} {{ form.append_mode }}</div>
+        </div>
+        
+        <!-- save button -->
+         <button type="submit"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
+            Save
+        </button>
+    </form>
+

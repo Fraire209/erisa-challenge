@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -129,3 +130,8 @@ LOGIN_URL = "login"
 # After successful login, redirect them to default view
 LOGIN_REDIRECT_URL = "/"
 
+# Absolute path definitions
+CLAIM_LIST_JSON = Path(settings.BASE_DIR) / "data" / "claim_list_data.json"
+CLAIM_DETAIL_JSON = Path(settings.BASE_DIR) / "data" / "claim_detail_data.json"
+CLAIM_LIST_CSV = Path(settings.BASE_DIR) / "data" / "claim_list_data.csv"
+CLAIM_DETAIL_CSV = Path(settings.BASE_DIR) / "data" / "claim_detail_data.csv"

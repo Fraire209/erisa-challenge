@@ -11,6 +11,7 @@ urlpatterns = [
     path('claim/<int:pk>/remove-flag/', views.remove_flag, name='remove_flag'),                             #called when remove flag button is pressed
     path("claim/<int:pk>/flags/", views.flag_partial, name="flag_partial"),                                 #called when view button is pressed to render flag panel
     path('claim/<int:pk>/actions/', views.quick_actions_partial, name='quick_actions_partial'),             #called when view is clicked for quick actions to receive claim id 
+    path('claim/<int:pk>/edit/', views.edit_claim, name='edit_claim'),                                      #called when a claim edit is saved
     path("login/", auth_views.LoginView.as_view(template_name="registration/login.html"), name="login"),    #called upon loading default view due to @login_required
     path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),                       #called by logout button
     path("signup/", views.signup_view, name="signup"),                                                      #called by signup button in login page

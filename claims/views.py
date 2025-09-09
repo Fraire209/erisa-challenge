@@ -1,12 +1,16 @@
 from django.shortcuts import render, get_object_or_404
 from claims.models import Claim,SystemFlag  #tables
-from claims.forms import NoteForm   #form template for claim notes
+from claims.forms import NoteForm, EditClaimForm   #form template for claim notes, and for file reupload
 from django.core.paginator import Paginator #split table into pages
 from django.db.models import Q, Count, Avg  # queries and math 
 from django.contrib.auth.decorators import login_required #make users log in to use the system
 from django.contrib.auth.models import User #built in user model, only using username and password fields
 from django.contrib import messages #allows for messages from views to templates
 from django.contrib.auth import login #attaches user to session, allows for request.user and instant login
+import json #writing to json files
+import csv  #writing to csv files
+from pathlib import Path    #used for file path
+from django.conf import settings    #used for absolute file path
 
 #default view, renders the table and the pagination controls
 @login_required     #forces log in 
@@ -197,3 +201,216 @@ def admin_dashboard(request):
 
     #renders the admin dashboard with the corresponding values 
     return render(request, 'claims/admin_dashboard.html', context)
+
+#absolute file paths for each file
+CLAIM_LIST_JSON = Path(settings.BASE_DIR) / "data" / "claim_list_data.json"
+CLAIM_DETAIL_JSON = Path(settings.BASE_DIR) / "data" / "claim_detail_data.json"
+CLAIM_LIST_CSV = Path(settings.BASE_DIR) / "data" / "claim_list_data.csv"
+CLAIM_DETAIL_CSV = Path(settings.BASE_DIR) / "data" / "claim_detail_data.csv"
+
+#write to claim_list_data files
+def save_claim_list(claim):
+    
+    original_id = claim.claim_id  # not Django PK, actual claim id
+
+    #JSON update
+    try:
+        with open(CLAIM_LIST_JSON, "r", encoding="utf-8") as f:             #open the file in read mode
+            data = json.load(f)
+    except FileNotFoundError:
+        data = None
+    
+    if data is not None:                                                    #will only write if the file exists
+        #bool check for update status 
+        updated = False
+        for item in data:
+            if item.get("id") == original_id:                               #if id matches the claim id being edited, the attributes are updated with respective typecasting
+                item.update({
+                    "patient_name": str(claim.patient_name),
+                    "billed_amount": float(claim.billed_amount),
+                    "paid_amount": float(claim.paid_amount),
+                    "insurer_name": str(claim.insurer_name),
+                    "status": str(claim.status),
+                    "discharge_date": str(claim.discharge_date),
+                })
+                updated = True  #set bool to true
+                break
+
+        #error case
+        if not updated:
+            print(f"Claim id={original_id} not found in JSON!")
+
+        else:
+            with open(CLAIM_LIST_JSON, "w", encoding="utf-8") as f:             #open file in write mode and overwrite with updated values
+                json.dump(data, f, indent=2)
+
+            #output message 
+            print(f"JSON saved to: {CLAIM_LIST_JSON}")
+
+    #CSV update
+    try:
+        with open(CLAIM_LIST_CSV, "r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f, delimiter="|")               # the csv files use pipe delimiter
+            rows = list(reader)
+            fieldnames = reader.fieldnames
+    except FileNotFoundError:
+        rows = None
+
+    if rows is not None:                                             #will only write if the file exists
+        #bool
+        updated = False
+        for row in rows:
+            if int(row["id"]) == original_id:                        #if id matches the claim id being edited, the attributes are updated, all strings 
+                row.update({
+                    "patient_name": str(claim.patient_name),
+                    "billed_amount": str(claim.billed_amount),
+                    "paid_amount": str(claim.paid_amount),
+                    "insurer_name": str(claim.insurer_name),
+                    "status": str(claim.status),
+                    "discharge_date": str(claim.discharge_date),
+                })
+                updated = True #update bool
+                break
+
+        #error case
+        if not updated:
+            print(f"Claim id={original_id} not found in CSV!")
+
+        else:
+            with open(CLAIM_LIST_CSV, "w", encoding="utf-8", newline="") as f:      #rewrite the file 
+                writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter="|")
+                writer.writeheader()
+                writer.writerows(rows)
+
+            #output message 
+            print(f"CSV saved to: {CLAIM_LIST_CSV}")
+
+
+#write to claim_detail_data files 
+def save_claim_detail(claim_detail):
+   
+   #if no claim details, it ends the function call
+    if not claim_detail:
+        return
+
+    original_id = claim_detail.claim.claim_id   # original id storing 
+
+    #JSON update
+    try:
+        with open(CLAIM_DETAIL_JSON, "r", encoding="utf-8") as f:       #open file in read mode and load to data
+            data = json.load(f)
+    except FileNotFoundError:
+        data = None
+    
+    if data is not None:                                                #will only write if the file exists
+        #bool variable
+        updated = False
+        for item in data:                                                   #if there is a id match, update the denial and cpt, both strings
+            if item.get("claim_id") == original_id:
+                item.update({
+                    "denial_reason": str(claim_detail.denial_reason),
+                    "cpt_codes": str(claim_detail.cpt_codes),
+                })
+                updated = True  #update bool
+                break
+
+        #error case 
+        if not updated:
+            print(f"Claim_detail claim_id={original_id} not found in JSON!")
+
+        else:
+            with open(CLAIM_DETAIL_JSON, "w", encoding="utf-8") as f:           #open file in write mode and overwrite 
+                json.dump(data, f, indent=2)
+
+            #output message 
+            print(f"JSON saved to: {CLAIM_DETAIL_JSON}")
+
+    #CSV update
+    try:
+        with open(CLAIM_DETAIL_CSV, "r", encoding="utf-8", newline="") as f:    #open file in read mode
+            reader = csv.DictReader(f, delimiter="|")                           #use pipe delimiters 
+            rows = list(reader)
+            fieldnames = reader.fieldnames
+    except FileNotFoundError:
+        rows = None
+    
+    if rows is not None:                                                         #will only write if the file exists
+        #bool variable
+        updated = False
+        for row in rows:
+            if int(row["claim_id"]) == original_id:                              #if there is a id match, update the denial and cpt, both strings
+                row.update({
+                    "denial_reason": str(claim_detail.denial_reason),
+                    "cpt_codes": str(claim_detail.cpt_codes),
+                })
+                updated = True      #set bool to true
+                break
+
+        #error case
+        if not updated:
+            print(f"Claim_detail claim_id={original_id} not found in CSV!")
+
+        else:
+            with open(CLAIM_DETAIL_CSV, "w", encoding="utf-8", newline="") as f:      #open in write mode and overwrite data
+                writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter="|")
+                writer.writeheader()
+                writer.writerows(rows)
+            #output message 
+            print(f"CSV saved to: {CLAIM_DETAIL_CSV}")
+
+#edit claim function
+def edit_claim(request, pk):
+    claim = get_object_or_404(Claim, pk=pk) #get claim object
+    claim_detail = claim.details.first()  # first instance of claim details for a claim, since there should only be one 
+
+    #if the form was submitted
+    if request.method == "POST":
+        form = EditClaimForm(request.POST, instance=claim)
+        if form.is_valid():                                     #check validity and save 
+            form.save()                                         #updates the Claim model
+
+            #claim detail, appending or overwriting 
+            mode = form.cleaned_data.get("append_mode", "overwrite")            #get selected mode
+            if claim_detail:
+                cpt_codes = form.cleaned_data.get("cpt_codes")                  #get cpt and denial reason attribute values from form
+                denial_reason = form.cleaned_data.get("denial_reason")
+
+                if cpt_codes:                                                   #if cpt codes are being appended, seperate them with a comma
+                    if mode == "append":
+                        claim_detail.cpt_codes = (
+                            (claim_detail.cpt_codes + "," + cpt_codes)
+                            if claim_detail.cpt_codes else cpt_codes            #if there was no codes to begin with, simply add the new codes
+                        )
+                    else:
+                        claim_detail.cpt_codes = cpt_codes                      #overwrite option 
+
+                if denial_reason:
+                    if mode == "append":                                        #append denial reasons separated with a comma
+                        claim_detail.denial_reason = (
+                            (claim_detail.denial_reason + " , " + denial_reason)
+                            if claim_detail.denial_reason else denial_reason    #no existing denial reasons case
+                        )
+                    else:
+                        claim_detail.denial_reason = denial_reason              #overwrite option
+
+                claim_detail.save()                                             #update ClaimDetails model 
+
+            # Write to files
+            save_claim_list(claim)
+            save_claim_detail(claim_detail)
+
+            # Return the form again with success message
+            context = {"form": form, "claim": claim, "success": "Claim updated successfully!"}
+            return render(request, "claims/edit_claim.html", context)
+           
+
+    else:
+        initial = {}
+        #populates the claim details in the form
+        if claim_detail:
+            initial = {"cpt_codes": claim_detail.cpt_codes, "denial_reason": claim_detail.denial_reason}
+        
+        form = EditClaimForm(instance=claim, initial=initial) #populated form with both claim and claim details
+
+    #render the prepopulated form 
+    return render(request, "claims/edit_claim.html", {"form": form, "claim": claim})
