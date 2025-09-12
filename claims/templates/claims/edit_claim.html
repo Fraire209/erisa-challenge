@@ -1,42 +1,83 @@
 
-    <!-- Success message area -->
-    <div id="edit-claim-message">
-        {% if success %}
-        <div class="px-4 py-2 mb-2 text-green-700 bg-green-100 rounded">
-            {{ success }}
+<!-- Success message area -->
+<div id="edit-claim-message">
+    {% if success %}
+    <div class="px-4 py-2 mb-2 text-green-700 bg-green-100 rounded">
+        {{ success }}
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- edit claim form -->
+<form method="POST"
+        hx-post="{% url 'edit_claim' claim.id %}"
+        hx-target="#edit-panel"
+        hx-swap="innerHTML"
+        x-show="open"
+        class="space-y-4">
+    
+        {% csrf_token %}                            <!-- middleware token -->
+
+    <!-- main 2 column gird -->
+    <div class="grid grid-cols-2 gap-6">
+
+        <!-- Patient Name -->
+        <div class="flex flex-col space-y-2">
+            <label class="font-semibold capitalize">{{ form.patient_name.label }}</label>
+            {{ form.patient_name }}
         </div>
-        {% endif %}
+
+        <!-- Discharge Date -->
+        <div class="flex flex-col space-y-2">
+            <label class="font-semibold capitalize">{{ form.discharge_date.label }}</label>
+            {{ form.discharge_date }}
+        </div>
+
+        <!-- Billed, Paid, Insurer -->
+        <div class="col-span-2">        <!-- makes it span 2 columns to fill the main 2 column grid -->
+            <div class="grid grid-cols-3 gap-4">        <!-- three column grid to display these fields in a single row -->
+                <div class="flex flex-col space-y-2">
+                    <label class="font-semibold capitalize">{{ form.billed_amount.label }}</label>
+                    {{ form.billed_amount }}
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <label class="font-semibold capitalize">{{ form.paid_amount.label }}</label>
+                    {{ form.paid_amount }}
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <label class="font-semibold capitalize">{{ form.insurer_name.label }}</label>
+                    {{ form.insurer_name }}
+                </div>
+            </div>
+        </div>
+
+        <!-- CPT Codes field + mode -->
+        <div class="flex flex-col space-y-1 border p-3 rounded-lg bg-gray-50">      <!-- stack vertically -->
+            <label class="font-semibold capitalize">{{ form.cpt_codes.label }}</label>
+            {{ form.cpt_codes }}
+            <div class="flex items-center space-x-4 mt-1 text-sm text-gray-700">    <!-- display options smaller -->
+                {{ form.cpt_mode }}
+            </div>
+        </div>
+
+        <!-- Denial Reason field + mode -->
+        <div class="flex flex-col space-y-1 border p-3 rounded-lg bg-gray-50">
+            <label class="font-semibold capitalize">{{ form.denial_reason.label }}</label>
+            {{ form.denial_reason }}
+            <div class="flex items-center space-x-4 mt-1 text-sm text-gray-700">
+                {{ form.denial_mode }}
+            </div>
+        </div>
 
     </div>
 
-    <!-- edit claim form -->
-    <form method="POST"
-          hx-post="{% url 'edit_claim' claim.id %}"
-          hx-target="#edit-panel"
-          hx-swap="innerHTML"
-          x-show="open"
-          class="space-y-4">
-        {% csrf_token %}                            <!-- middleware token -->
-
-        <!-- two columns to reduce size -->
-        <div class="grid grid-cols-2 gap-2">
-            <!-- Claim fields -->
-            <div>{{ form.patient_name.label_tag }} {{ form.patient_name }}</div>
-            <div>{{ form.discharge_date.label_tag }} {{ form.discharge_date }}</div>
-            <div>{{ form.billed_amount.label_tag }} {{ form.billed_amount }}</div>
-            <div>{{ form.paid_amount.label_tag }} {{ form.paid_amount }}</div>
-            <div>{{ form.insurer_name.label_tag }} {{ form.insurer_name }}</div>
-            <!-- ClaimDetail fields -->
-            <div>{{ form.cpt_codes.label_tag }} {{ form.cpt_codes }}</div>
-            <div>{{ form.denial_reason.label_tag }} {{ form.denial_reason }}</div>
-            <div>{{ form.append_mode.label_tag }} {{ form.append_mode }}</div>
-        </div>
-        
-        <!-- save button -->
-         <button type="submit"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-        >
+    <!-- save button -->
+    <div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded shadow">
             Save
         </button>
-    </form>
+    </div>
+
+</form>
 

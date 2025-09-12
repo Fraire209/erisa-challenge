@@ -10,6 +10,7 @@ class NoteForm(forms.ModelForm):   #builds form based on existing fields
         }
 
 class EditClaimForm(forms.ModelForm):
+    
     # Extra fields for ClaimDetail
     cpt_codes = forms.CharField(
         required=False,
@@ -31,11 +32,21 @@ class EditClaimForm(forms.ModelForm):
         ('overwrite', 'Overwrite existing'),
         ('append', 'Add to existing'),
     )
-    append_mode = forms.ChoiceField(
+    
+    #edit choices for both fields
+    cpt_mode = forms.ChoiceField(
         choices=CHOICES,
         widget=forms.RadioSelect,
-        initial='overwrite',                        #overwrite will always be preselected
-        label="Update Mode for CPT/Denial Reason",
+        initial='overwrite',
+        label="CPT Codes Update Mode",
+        required=False
+    )
+
+    denial_mode = forms.ChoiceField(
+        choices=CHOICES,
+        widget=forms.RadioSelect,
+        initial='overwrite',
+        label="Denial Reason Update Mode",
         required=False
     )
 

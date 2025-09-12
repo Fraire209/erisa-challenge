@@ -86,42 +86,6 @@
             </tr>
         </tfoot>
     </table>
-
-    <!-- event listener to trigger a ajax request for claim/pk/notes url based on a request to claim detail panel. extracts its claim id -->
-    <script>
-    
-        // Listener for when claim detail panel updates, hx-on:afterRequest did not work
-        document.body.addEventListener('htmx:afterSwap', function(evt) {                                    //works for max of two urls else it skips one
-            if(evt.target.id === 'claim-detail-panel'){
-                const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/details\//);
-                if(urlMatch){
-                    const claimId = urlMatch[1];
-
-                    // Update notes panel
-                    htmx.ajax('GET', `/claim/${claimId}/notes/`, {target:'#notes-panel', swap:'innerHTML'});
-
-                    // Update flag panel
-                    htmx.ajax('GET', `/claim/${claimId}/flags/`, {target:'#flag-panel', swap:'innerHTML'});
-                }
-            }
-        });
-
-        // Listener for when flag panel updates, then update actions panel                                      //second listner to make sure ALL urls are invoked
-        document.body.addEventListener('htmx:afterSwap', function(evt) {
-            if(evt.target.id === 'flag-panel'){
-                const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/flags\//);
-                if(urlMatch){
-                    const claimId = urlMatch[1];
-
-                    // Update actions panel after flag panel is loaded
-                    htmx.ajax('GET', `/claim/${claimId}/actions/`, {target:'#quick-actions-panel', swap:'innerHTML'});
-                }
-            }
-        });
-
-        
-    </script>
-
      
     <!-- Pagination controls -->
     <div class="flex justify-between mt-4"> <!-- This flex container keeps first element to the left of page and second to the right for the previous and next buttons -->
@@ -157,15 +121,20 @@
     </div>
 </div>
 
+<!-- hidden inputs for reloading-->
+<input type="hidden" id="current-page" value="{{ claims.number }}">
+<input type="hidden" id="current-q" value="{{ q }}">
+<input type="hidden" id="current-insurer" value="{{ selected_insurer }}">
+<input type="hidden" id="current-status" value="{{ selected_status }}">
+
+
 <!-- Flex row for left and right containers -->
 <div class="flex mt-2 gap-4">
 
-    <!-- Fixed bottom-left panel -->
+   <!-- Fixed bottom-left panel -->
     <div id="claim-detail-panel" class="mt-4 w-1/2 bg-gray-100 border border-gray-300 shadow p-4 rounded-2xl overflow-auto">
         {% if claims %}
             {% include "claims/claim_detail_partial.html" with claim=claims.0 %}
-        {% else %}
-            <p>No claim selected.</p> 
         {% endif %}
     </div>
 
@@ -187,9 +156,7 @@
             <!-- Flag panel -->
             <div id="flag-panel">
                 {% if claims %}
-                    {% include "claims/flag_partial.html" with claim=claims.0 %}
-                {% else %}
-                    <p>No flags set.</p>
+                    {% include "claims/flag_partial.html" with flags=claims.0.flags.all %}
                 {% endif %}
             </div>
         </div>
@@ -201,3 +168,51 @@
     </div>
 
 </div>
+
+<script>
+        
+    //event listener to trigger a ajax request for claim/pk/notes url based on a request to claim detail panel, extracts its claim id. Works for max of two urls else it skips one
+    document.body.addEventListener('htmx:afterSwap', function(evt) {                                   
+        if(evt.target.id === 'claim-detail-panel'){                                             //executes when claim-detail-panel is swapped
+            const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/details\//);     //regex to extract claim id
+            if(urlMatch){
+                const claimId = urlMatch[1];                                                    //claim id stored in index 1
+
+                //Request to update notes panel
+                htmx.ajax('GET', `/claim/${claimId}/notes/`, {target:'#notes-panel', swap:'innerHTML'});
+
+                //Request to update flag panel
+                htmx.ajax('GET', `/claim/${claimId}/flags/`, {target:'#flag-panel', swap:'innerHTML'});
+            }
+        }
+    });
+
+    let lastClaimId = null;  //save the last processed claim id
+
+    //only lets actions panel load once per claim id since you can call add and remove flags urls to same claim id 
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if (evt.target.id === 'flag-panel') {                                               //executes if flag-panel is swapped
+            const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/flags\//);   //extracts claim id
+            if (urlMatch) {
+                const claimId = urlMatch[1];                                                //claim id stored at index 1
+
+                // Only trigger if claimId is different from the last one
+                if (claimId !== lastClaimId) {
+                    lastClaimId = claimId; // update saved claim id
+                        
+                    //request to swap the quick actions panel with new claim id
+                    htmx.ajax('GET', `/claim/${claimId}/actions/`, {target: '#quick-actions-panel', swap: 'innerHTML'});
+                }
+            }
+        }
+    });
+
+    //Allows for claim to be reclicked after a successful flag pannel swap due to the cached claim id from before swap 
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        if (evt.target.id === 'claims-table') {                 
+            lastClaimId = null; // reset when claims-table is swapped 
+        }
+    });
+        
+</script>
+
