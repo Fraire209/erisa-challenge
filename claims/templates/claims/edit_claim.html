@@ -19,8 +19,8 @@
     
         {% csrf_token %}                            <!-- middleware token -->
 
-    <!-- main 2 column gird -->
-    <div class="grid grid-cols-2 gap-6">
+    <!-- main 3 column gird -->
+    <div class="grid grid-cols-3 gap-6 border border-gray-200 rounded-xl px-4 py-4">
 
         <!-- Patient Name -->
         <div class="flex flex-col space-y-2">
@@ -34,40 +34,61 @@
             {{ form.discharge_date }}
         </div>
 
-        <!-- Billed, Paid, Insurer -->
-        <div class="col-span-2">        <!-- makes it span 2 columns to fill the main 2 column grid -->
-            <div class="grid grid-cols-3 gap-4">        <!-- three column grid to display these fields in a single row -->
-                <div class="flex flex-col space-y-2">
-                    <label class="font-semibold capitalize">{{ form.billed_amount.label }}</label>
-                    {{ form.billed_amount }}
-                </div>
-                <div class="flex flex-col space-y-2">
-                    <label class="font-semibold capitalize">{{ form.paid_amount.label }}</label>
-                    {{ form.paid_amount }}
-                </div>
-                <div class="flex flex-col space-y-2">
-                    <label class="font-semibold capitalize">{{ form.insurer_name.label }}</label>
-                    {{ form.insurer_name }}
-                </div>
-            </div>
+        <!-- Status -->
+        <div class="flex flex-col space-y-2">
+            <label class="font-semibold caputalize">{{form.status.label}}</label>
+            {{form.status}}
         </div>
 
-        <!-- CPT Codes field + mode -->
-        <div class="flex flex-col space-y-1 border p-3 rounded-lg bg-gray-50">      <!-- stack vertically -->
-            <label class="font-semibold capitalize">{{ form.cpt_codes.label }}</label>
-            {{ form.cpt_codes }}
-            <div class="flex items-center space-x-4 mt-1 text-sm text-gray-700">    <!-- display options smaller -->
-                {{ form.cpt_mode }}
-            </div>
+        <!-- Billed -->
+        <div class="flex flex-col space-y-2">
+            <label class="font-semibold capitalize">{{ form.billed_amount.label }}</label>
+            {{ form.billed_amount }}
+        </div>
+         
+        <!-- Paid -->
+        <div class="flex flex-col space-y-2">
+            <label class="font-semibold capitalize">{{ form.paid_amount.label }}</label>
+            {{ form.paid_amount }}
+        </div>
+        
+        <!-- Insurer -->
+        <div class="flex flex-col space-y-2">
+            <label class="font-semibold capitalize">{{ form.insurer_name.label }}</label>
+            {{ form.insurer_name }}
+        </div>
+            
+        <!-- Input instructions spanning all three columns -->
+        <div class="col-span-3 border border-yellow-500 bg-yellow-100 rounded text-center text-yellow-500">
+            If you wish to make no change to CPT codes or denial reason, please leave blank
         </div>
 
-        <!-- Denial Reason field + mode -->
-        <div class="flex flex-col space-y-1 border p-3 rounded-lg bg-gray-50">
-            <label class="font-semibold capitalize">{{ form.denial_reason.label }}</label>
-            {{ form.denial_reason }}
-            <div class="flex items-center space-x-4 mt-1 text-sm text-gray-700">
-                {{ form.denial_mode }}
+        <!-- CPT and Denial Reason spanning all three columns -->
+        <div class="col-span-3">
+            
+            <!-- two column view for cpt and denial reason -->
+            <div class="grid grid-cols-2 gap-4">
+            
+                <!-- CPT Codes field + mode -->
+                <div class="flex flex-col space-y-1 border p-3 rounded-lg bg-gray-50">      <!-- stack vertically -->
+                    <label class="font-semibold capitalize">{{ form.cpt_codes.label }}</label>
+                    {{ form.cpt_codes }}
+                    <div class="flex items-center space-x-4 mt-1 text-sm text-gray-700">    <!-- display options smaller -->
+                        {{ form.cpt_mode }}
+                    </div>
+                </div>
+
+                <!-- Denial Reason field + mode -->
+                <div class="flex flex-col space-y-1 border p-3 rounded-lg bg-gray-50">
+                    <label class="font-semibold capitalize">{{ form.denial_reason.label }}</label>
+                    {{ form.denial_reason }}
+                    <div class="flex items-center space-x-4 mt-1 text-sm text-gray-700">
+                        {{ form.denial_mode }}
+                    </div>
+                </div>
+
             </div>
+
         </div>
 
     </div>

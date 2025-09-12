@@ -1,8 +1,5 @@
 
-{% load humanize %} <!-- for number formatting -->
-
-<!-- detail dashboard template -->
-<div>
+    {% load humanize %} <!-- for number formatting -->
 
     <!-- title and status in column flex box to display them side to side -->
     <div class="grid grid-cols-2 gap-4 mb-2 font-semibold">
@@ -18,30 +15,30 @@
     </div>
 
     <!-- divides grid into two columns -->
-     <div class="flex justify-center mb-6 space-x-80">          <!-- space-x-80 is the space betweent the two items, increased bottom margin (mb) -->
+     <div class="flex justify-center pt-10 mb-8 gap-20">          <!-- space-x-80 is the space betweent the two items, increased bottom margin (mb) -->
         <!-- Patient Name -->
-        <div class="flex flex-col">                             <!-- stacks children vertically using span tags -->
+        <div class="flex flex-col items-center w-80">                             <!-- stacks children vertically using span tags, fixed widths to maintain styling -->
             <span class="font-semibold text-gray-600">Patient Name:</span>
             <span class="font-bold">{{ claim.patient_name }}</span>
         </div>
 
         <!-- Discharge Date -->
-        <div class="flex flex-col text-right">
+        <div class="flex flex-col items-center w-80">
             <span class="font-semibold text-gray-600">Discharge:</span>
-            <span>{{ claim.discharge_date }}</span>
+            <span class="font-bold">{{ claim.discharge_date }}</span>
         </div>
     </div>
 
    
-    <div class="flex justify-center mb-2 space-x-80">
+    <div class="flex justify-center gap-20 mb-10">
         <!-- Billed Amount-->
-        <div class="flex flex-col">
+        <div class="flex flex-col items-center w-80">
             <span class="font-semibold text-gray-600">Billed Amount:</span>
             <span class="font-bold">${{ claim.billed_amount|floatformat:2|intcomma }}</span> <!-- float number formatting with commas -->
         </div>
 
         <!-- Paid Amount -->
-        <div class="flex flex-col text-right">
+        <div class="flex flex-col items-center w-80">
             <span class="font-semibold text-gray-600">Paid Amount:</span>
             <span class="font-bold text-red-500">${{ claim.paid_amount|floatformat:2|intcomma }}</span>
         </div>
@@ -73,4 +70,3 @@
         <p>No claim detail records found.</p>
     {% endif %}
 
-</div>

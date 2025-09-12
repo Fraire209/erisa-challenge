@@ -17,7 +17,7 @@ from django.conf import settings    #used for absolute file path
 def home(request):
     search_query = request.GET.get("q", "")
     page_number = request.GET.get("page", 1)
-    claims_list = Claim.objects.all().order_by("id").prefetch_related('details','flags')  # Order for consistency and fetches the associated details from ClaimDetails
+    claims_list = Claim.objects.all().order_by("id").prefetch_related('details','flags', 'notes')  # Order for consistency and fetches the associated details from ClaimDetails and Notes
     selected_insurer = request.GET.get("insurer", "")
     selected_status = request.GET.get("status", "")
 
@@ -65,7 +65,7 @@ def home(request):
 
     if request.headers.get("HX-Request"):  
         # If request comes from HTMX, return only the table body
-        return render(request, "claims/claims_table_body.html", context) #avoids rerendering the search and filter sections
+        return render(request, "claims/claims_table_body.html", context) #avoids rerendering the search and filter, and detail notes/annotations and quick actions back to claim.0
 
     return render(request, "claims/base.html", context) # returns full page upon initial load
 
@@ -368,18 +368,16 @@ def edit_claim(request, pk):
         form = EditClaimForm(request.POST, instance=claim)
         if form.is_valid():                                     #check validity and save 
             form.save()                                         #updates the Claim model
-
-            #claim detail, appending or overwriting 
-            mode = form.cleaned_data.get("append_mode", "overwrite")            #get selected mode
             
             if claim_detail:
                 cpt_codes = form.cleaned_data.get("cpt_codes")                  #get cpt and denial reason attribute values from form
                 denial_reason = form.cleaned_data.get("denial_reason")
                 cpt_mode = form.cleaned_data.get("cpt_mode", "overwrite")       #retrieves mode, sets overwrite as default
                 denial_mode = form.cleaned_data.get("denial_mode", "overwrite") 
+                print(denial_mode)
 
                 if cpt_codes:                                                   #if cpt codes are being appended, seperate them with a comma
-                    if cpt_mode == "append":
+                    if cpt_mode == "Append":                                    #using "Append" since the clean form function capitalizes it 
                         claim_detail.cpt_codes = (
                             (claim_detail.cpt_codes + "," + cpt_codes)
                             if claim_detail.cpt_codes else cpt_codes            #if there was no codes to begin with, simply add the new codes
@@ -388,7 +386,7 @@ def edit_claim(request, pk):
                         claim_detail.cpt_codes = cpt_codes                      #overwrite option 
 
                 if denial_reason:
-                    if denial_mode == "append":                                        #append denial reasons separated with period
+                    if denial_mode == "Append":                                        #append denial reasons separated with period
                         claim_detail.denial_reason = (
                             (claim_detail.denial_reason + ". " + denial_reason)
                             if claim_detail.denial_reason else denial_reason    #no existing denial reasons case

@@ -39,7 +39,8 @@
 
                 <button 
                     type="submit" 
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                    @click="open = !open">
                     Submit
                 </button>
             </form>
@@ -122,27 +123,55 @@
         
         //this listener waits for the flag-panel to be targeted, then takes the claim id from the two possible urls being called to update the flag button and the table -->
         document.body.addEventListener('htmx:afterSwap', function(evt) {
-        const targetId = evt.target.id;
-        
-        //hidden inputs 
-        const page = document.getElementById('current-page')?.value || 1;                                  //gets page number of table
-        const q = document.getElementById('current-q')?.value || '';                                       //gets current query paramter
-        const insurer = document.getElementById('current-insurer')?.value || '';                           //gets insurer
-        const status = document.getElementById('current-status')?.value || '';                             //gets claim status 
+            const targetId = evt.target.id;
+            
+            //hidden inputs 
+            const page = document.getElementById('current-page')?.value || 1;                                  //gets page number of table
+            const q = document.getElementById('current-q')?.value || '';                                       //gets current query paramter
+            const insurer = document.getElementById('current-insurer')?.value || '';                           //gets insurer
+            const status = document.getElementById('current-status')?.value || '';                             //gets claim status 
 
-        if (targetId === 'flag-panel') {                                                                   //triggers when flag-panel is swapped
-            const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/(add|remove)-flag/);        //used to extract the claim id from the url being called, with two possible options
-            if (urlMatch) {
-                const claimId = urlMatch[1];                                                               //claim id stored in index 1
+            if (targetId === 'flag-panel') {                                                                   //triggers when flag-panel is swapped
+                const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/(add|remove)-flag/);        //used to extract the claim id from the url being called, with two possible options
+                if (urlMatch) {
+                    const claimId = urlMatch[1];                                                               //claim id stored in index 1
 
-                // Trigger the actions partial to update the button
-                htmx.ajax('GET', `/claim/${claimId}/actions/`, {target: '#quick-actions-panel', swap: 'innerHTML'});
-                
-                //Update claims table with current page and filter parameters if they exist 
-                htmx.ajax('GET', `/?page=${page}&q=${encodeURIComponent(q)}&insurer=${encodeURIComponent(insurer)}&status=${encodeURIComponent(status)}`, {target: '#claims-table', swap: 'innerHTML'});
+                    // Trigger the actions partial to update the button
+                    htmx.ajax('GET', `/claim/${claimId}/actions/`, {target: '#quick-actions-panel', swap: 'innerHTML'});
+                    
+                    //Update claims table with current page and filter parameters if they exist 
+                    htmx.ajax('GET', `/?page=${page}&q=${encodeURIComponent(q)}&insurer=${encodeURIComponent(insurer)}&status=${encodeURIComponent(status)}`, {target: '#claims-table', swap: 'innerHTML'});
+                }
             }
-        }
     
         });
+
+        //listens for notes-panel to be swapped to rerender table to show note svg icon and remains in current page 
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            const targetId = evt.target.id;
+
+            //hidden inputs 
+            const page = document.getElementById('current-page')?.value || 1;                                  //gets page number of table
+            const q = document.getElementById('current-q')?.value || '';                                       //gets current query paramter
+            const insurer = document.getElementById('current-insurer')?.value || '';                           //gets insurer
+            const status = document.getElementById('current-status')?.value || ''; 
+
+            // Trigger only when notes-panel is swapped
+            if (targetId === 'notes-panel') {
+                // Extract the claim ID from the current URL (or the triggering element)
+                const urlMatch = evt.detail.xhr.responseURL.match(/\/claim\/(\d+)\/add-note/);
+
+                if (urlMatch) {
+                    const claimId = urlMatch[1];
+
+                    //Update claims table with current page and filter parameters if they exist 
+                    htmx.ajax('GET', `/?page=${page}&q=${encodeURIComponent(q)}&insurer=${encodeURIComponent(insurer)}&status=${encodeURIComponent(status)}`, {target: '#claims-table', swap: 'innerHTML'});
+                   
+                }
+            }
+
+        });
+
+        
     
     </script>

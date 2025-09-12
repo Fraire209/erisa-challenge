@@ -132,6 +132,46 @@
                 {% include "claims/claims_table_body.html" %}
         </div>
         
+        <!-- Flex row for left and right containers -->
+        <div class="flex mt-2 gap-4">
+
+        <!-- Fixed bottom-left panel -->
+        <div id="claim-detail-panel" class="mt-4 w-1/2 bg-gray-100 border border-gray-300 shadow p-4 rounded-2xl overflow-auto">
+            {% if claims %}
+                {% include "claims/claim_detail_partial.html" with claim=claims.0 %}
+            {% endif %}
+        </div>
+
+        <!-- Right: Two main vertical containers -->
+        <div class="w-1/2 flex flex-col gap-2">
+
+            <!-- top container with two stacked boxes inside of it  -->
+            <div class=" flex flex-col  bg-gray-100 mt-4 border border-gray-300 shadow  p-4 rounded-2xl flex-1">
+
+                <!-- Notes panel -->
+                <div id="notes-panel">
+                    {% if claims %}
+                        {% include "claims/notes_partial.html" with claim=claims.0 %}
+                    {% else %}
+                        <p>No claim selected.</p> 
+                    {% endif %}
+                </div>
+
+                <!-- Flag panel -->
+                <div id="flag-panel">
+                    {% if claims %}
+                        {% include "claims/flag_partial.html" with flags=claims.0.flags.all %}
+                    {% endif %}
+                </div>
+            </div>
+            <!-- bottom container div -->
+            <div id="quick-actions-panel">
+                    {% include "claims/actions_partial.html" with claim=claims.0 %}
+            </div>
+
+        </div>
+
+        </div>
 
         <!-- admin panel section, will be empty until triggered by button in actions_partial -->
         <div    id="admin-panel"
@@ -170,6 +210,7 @@
                     //Update claims table with current filter parameters and page number
                     htmx.ajax('GET', `/?page=${page}&q=${encodeURIComponent(q)}&insurer=${encodeURIComponent(insurer)}&status=${encodeURIComponent(status)}`, {target: '#claims-table', swap: 'innerHTML'});
 
+                    htmx.ajax('GET', `/claim/${claimId}/details/`, {target:'#claim-detail-panel', swap:'innerHTML'});
                     //Resets counter and claim cache
                     editHitCount = 0;
                     lastEditClaimId = null;
