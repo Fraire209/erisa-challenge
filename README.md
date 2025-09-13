@@ -2,6 +2,17 @@
 
 This Django webapp allows for JSON/CSV data ingestion into a SQLite database via a management command to display all claims with ID, patient name, billed amount, paid amount, status, and insurer name. It also allows for claim-specific information such as CPT codes, denial reasons, notes, and flags to be displayed without full page reload. Users can flag claims for review, add custom notes stored in the SQLite database, and can also use the search and filter functionality by name, id, billed amount, paid amount, claim status and insurer name. The webapp includes a registration and login page, supports JSON/CSV data overwrite and appending, and generates a admin dashboard displaying number of claims, percentage that is paid/denied, number of flags, average underpayment, and graphs displaying the ratios between paid/denied/under review claims, and how they are distributed among the insurers. 
 
+### Built With
+
+[![Django][DjangoBadge]][Django]
+[![Python][PythonBadge]][Python]
+[![Alpine.js][Alpine.jsBadge]][Alpine.js]
+[![HTMX][HTMXBadge]][HTMX]
+[![SQLite][SQLiteBadge]][SQLite]
+[![Tailwind CSS][TailwindCSSBadge]][Tailwind CSS]
+[![Git][GitBadge]][Git]
+
+
 ---
 
 ## Table of Contents
@@ -20,36 +31,58 @@ This Django webapp allows for JSON/CSV data ingestion into a SQLite database via
 
 ## Installation 
 
-1. Clone Repository
+1. **Install Python**  
+Download Python 3.13+ from [Python], or using your preffered package manager.
+    
+
+2. **Clone Repository**
 
 ```bash
 git clone https://github.com/Fraire209/insurance-claim-django-webapp.git 
 cd insurance-claim-django-webapp
 ```
 
-2. Create a virtual environment
+3. **Create a virtual environment**
 
 ```bash
 python3 -m venv venv
+```
+4. **Activate virtual environment** 
+ 
+MacOS/Linux
+```bash
 source venv/bin/activate
 ```
-3. Install Django
+
+Git Bash, WSL
+```bash
+source venv/Scripts/activate 
+```
+PowerShell
+```bash
+venv\Scripts\Activate.ps1
+```
+Command Prompt
+```bash
+venv\Scripts\activate.bat
+```
+5. **Install Django**
 
 ```bash
 pip install django
 ```
 
-4. Apply migrations
+6. **Apply migrations**
 
 ```bash
 python manage.py migrate
 ```
-5. Load JSON/CSV files through management command
+7. **Load JSON/CSV files through management command**
 
 ```bash
 python manage.py load_claims
 ```
-6. Run server
+8. **Run server**
 
 ```bash
 python manage.py runserver
@@ -143,11 +176,11 @@ A success message will print telling you the name of the deleted table and confi
 * Editing
 * Create, Read, Update
 * Support for multiple file formats
-* Easy installation of [Django](https://www.djangoproject.com/) via pip
-* Dynamic content loading using [HTMX](https://htmx.org/) to avoid full reloads
-* Interactive UI elements with [Alpine.js](https://alpinejs.dev/) for dropdowns and toggles
-* Lightweight [SQLite](https://sqlite.org/) database with no setup required
-* Responsive UI styled with [Tailwind CSS](https://tailwindcss.com/)  
+* Easy installation of [Django] via pip
+* Dynamic content loading using [HTMX] to avoid full reloads
+* Interactive UI elements with [Alpine.js] for dropdowns and toggles
+* Lightweight [SQLite] database with no setup required
+* Responsive UI styled with [Tailwind CSS]
 
 ---
 ## Requirements 
@@ -187,7 +220,7 @@ This project is for personal use and not licensed for public distribution.
 ---
 ## Contact
 
-Daniel Fraire - fraire209@icloud.com - [LinkedIn](www.linkedin.com/in/fraire-daniel)
+Daniel Fraire - fraire209@icloud.com - [LinkedIn]
 
 Project Link - https://github.com/Fraire209/insurance-claim-django-webapp
 
@@ -202,5 +235,24 @@ Project Link - https://github.com/Fraire209/insurance-claim-django-webapp
 * [heroicons](https://heroicons.com/outline)
 * [Wordpress Markdown Documentation](https://wordpress.com/support/markdown-quick-reference/)
 * [geeksforgeeks Django Documentation](https://www.geeksforgeeks.org/python/django-tutorial/)
+* [Github Mardown Badges](https://github.com/Ileriayo/markdown-badges)
 
-
+<!-- MARKDOWN LINKS & IMAGES -->
+[Django]: https://www.djangoproject.com/
+[HTMX]: https://htmx.org/
+[Alpine.js]: https://alpinejs.dev/
+[SQLite]: https://sqlite.org/
+[Tailwind CSS]: https://tailwindcss.com/
+[Python]: https://www.python.org/
+[Git]: https://git-scm.com/
+[LinkedIn]: https://linkedin.com/in/fraire-daniel
+[SQLiteBadge]: https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white
+[Chart.jsBadge]: https://img.shields.io/badge/chart.js-F5788D.svg?style=for-the-badge&logo=chart.js&logoColor=white
+[DjangoBadge]: https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white
+[Alpine.jsBadge]: https://img.shields.io/badge/alpinejs-white.svg?style=for-the-badge&logo=alpinedotjs&logoColor=%238BC0D0
+[TailwindCSSBadge]: https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white
+[HTMLBadge]: https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white
+[HTMXBadge]: https://img.shields.io/badge/HTMX-%2302569B.svg?style=for-the-badge&logo=htmx&logoColor=white
+[PythonBadge]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[GitBadge]: https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white
+[LinkedInBadge]: https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white
