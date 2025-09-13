@@ -145,3 +145,11 @@ CLAIM_DETAIL_CSV = Path(settings.BASE_DIR) / "data" / "claim_detail_data.csv"
 
 # Expire the session when the browser closes to make user log back in
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+#render 
+ALLOWED_HOSTS = [
+    "localhost",                   #local dev
+    "127.0.0.1",                   
+    os.environ.get("RENDER_EXTERNAL_HOSTNAME", ""),  #from Render
+    "erisa-challenge-sm88.onrender.com",  #url
+]
