@@ -135,3 +135,6 @@ CLAIM_LIST_JSON = Path(settings.BASE_DIR) / "data" / "claim_list_data.json"
 CLAIM_DETAIL_JSON = Path(settings.BASE_DIR) / "data" / "claim_detail_data.json"
 CLAIM_LIST_CSV = Path(settings.BASE_DIR) / "data" / "claim_list_data.csv"
 CLAIM_DETAIL_CSV = Path(settings.BASE_DIR) / "data" / "claim_detail_data.csv"
+
+# Expire the session when the browser closes to make user log back in
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

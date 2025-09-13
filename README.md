@@ -146,7 +146,7 @@ A success message will print telling you the name of the deleted table and confi
 * Easy installation of [Django](https://www.djangoproject.com/) via pip
 * Dynamic content loading using [HTMX](https://htmx.org/) to avoid full reloads
 * Interactive UI elements with [Alpine.js](https://alpinejs.dev/) for dropdowns and toggles
-* Lightweight [SQLite](https://sqlite.org/) databse with no setup required
+* Lightweight [SQLite](https://sqlite.org/) database with no setup required
 * Responsive UI styled with [Tailwind CSS](https://tailwindcss.com/)  
 
 ---
