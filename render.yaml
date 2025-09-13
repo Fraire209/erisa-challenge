@@ -6,7 +6,7 @@ services:
       pip install -r requirements.txt
       python manage.py migrate
       python manage.py load_data   #load management command
-    startCommand: gunicorn your_project_name.wsgi:application
+    startCommand: myproject.wsgi:application
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: your_project_name.settings
+        value: myproject.settings
