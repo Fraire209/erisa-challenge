@@ -38,7 +38,7 @@ Download Python 3.13+ from [Python], or using your preffered package manager.
 2. **Clone Repository**
 
 ```bash
-git clone https://github.com/Fraire209/insurance-claim-django-webapp.git 
+git clone https://github.com/Fraire209/erisa-challenge.git
 cd insurance-claim-django-webapp
 ```
 
