@@ -69,7 +69,7 @@ venv\Scripts\activate.bat
 5. **Install Django**
 
 ```bash
-pip install django
+pip install -r requirements.txt
 ```
 
 6. **Apply migrations**
