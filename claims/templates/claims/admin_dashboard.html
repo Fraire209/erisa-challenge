@@ -50,13 +50,28 @@
     <script>  
         // Status Pie Chart in defined canvas id
         var statusCtx = document.getElementById('statusChart').getContext('2d');
+
+        //Set defined colors based on status 
+        const colorMap = {
+            "under review": "#93c5fd", // bluish
+            "paid": "#86efac",         // greenish
+            "denied": "#fca5a5"        // reddish
+        };
+
+        //Labels and status count
+        const labels = {{ status_labels|safe }};
+        const data = {{ status_counts|safe }};
+
+        //Generate colors array based on label order
+        const backgroundColors = labels.map(label => colorMap[label.toLowerCase()]);
+
         new Chart(statusCtx, {
             type: 'pie',
             data: {
-                labels: {{ status_labels|safe }},   //denied, paid, under review
+                labels: labels,
                 datasets: [{
-                    data: {{ status_counts|safe }},
-                    backgroundColor: ['#fca5a5','#86efac','#93c5fd'] 
+                    data: data,
+                    backgroundColor: backgroundColors
                 }]
             },
             options: {
