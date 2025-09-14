@@ -66,7 +66,7 @@ Command Prompt
 ```bash
 venv\Scripts\activate.bat
 ```
-5. **Install Django**
+5. **Install project requirements**
 
 ```bash
 pip install -r requirements.txt
